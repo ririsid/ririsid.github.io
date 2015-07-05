@@ -1,14 +1,12 @@
 # Site settings
-title: Your awesome title
-email: your-email@domain.com
+title: RiRi at Creai
+email: riri@creai.net
 description: > # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  초보 개발자 RiRi가 개발하며 배운 것들. #iOS #Objective-C #Swift
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://yourdomain.com" # the base hostname & protocol for your site
-twitter_username: jekyllrb
-github_username:  jekyll
+url: "http://riri.creai.net" # the base hostname & protocol for your site
+twitter_username: ririsid
+github_username:  ririsid
 
 # Build settings
 markdown: kramdown
