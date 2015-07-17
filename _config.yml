@@ -9,4 +9,5 @@ twitter_username: ririsid
 github_username:  ririsid
 
 # Build settings
-markdown: kramdown
+markdown: redcarpet
+highlighter: rouge

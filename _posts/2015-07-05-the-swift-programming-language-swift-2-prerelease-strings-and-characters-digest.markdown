@@ -22,27 +22,27 @@ categories: swift study
 - 문자열 리터럴을 통해 _String_ 값을 사용할 수 있다.
 - 문자열 리터럴은 쌍따옴표로 둘러쌓인 연속된 문자이다.
 
-~~~ swift
+``` swift
 let someString = "Some string literal value"
-~~~
+```
 
 ### 빈 문자열 만들기
 
 - 빈 문자열 리터럴 또는 _String_ 초기화 문법을 통해 빈 문자열을 만들 수 있다.
 
-~~~ swift
+``` swift
 var emptyString = ""
 var anotherEmptyString = String()
-~~~
+```
 
 - 두 방법의 결과는 동일하다.
 - _isEmpty_ 속성을 통해 _String_ 값이 빈 문자열인지 확인할 수 있다.
 
-~~~ swift
+``` swift
 if emptyString.isEmpty {
 	print("Nothing to see here")
 }
-~~~
+```
 
 ### 문자열 변수
 
@@ -64,11 +64,11 @@ if emptyString.isEmpty {
 
 - _for-in_ 루프에 _String_ 값의 _characters_ 프로퍼티를 넣으면 각각의 _Character_ 값에 접근할 수 있다.
 
-~~~ swift
+``` swift
 for character in "Dog!🐶".characters {
 	print(character)
 }
-~~~
+```
 
 - 단일 문자 리터럴에 _Character_ 타입 주석을 붙여서 독립적인 _Character_ 상수나 변수를 만들 수 있다.
 - _Character_ 값의 배열을 _String_ 값의 초기화 메소드에 넘겨서 _String_ 값을 만들 수 있다.
@@ -77,11 +77,11 @@ for character in "Dog!🐶".characters {
 
 - \+ 연산자를 사용해서 문자열을 더한 새로운 _String_ 값을 만들 수 있다.
 
-~~~ swift
+``` swift
 let string1 = "hello"
 let string2 = " there"
 var welcome = string1 + string2
-~~~
+```
 
 - \+= 연산자도 사용할 수 있다.
 - _String_ 타입의 _append()_ 메소드를 사용해서 _Character_ 값을 덧붙일 수 있다.
@@ -93,10 +93,10 @@ var welcome = string1 + string2
 - 문자열 삽입은 상수, 변수, 리터럴, 표현식이 섞여있는 문자열 리터럴에서 새로운 _String_ 값을 만들어내는 방법이다.
 - 문자열 리터럴에 백슬래시가 앞에 붙은 괄호로 둘러쌓인 값을 삽입한다.
 
-~~~ swift
+``` swift
 let multiplier = 3
 let message = "\(multiplier) times 2.5 is \(Double(multiplier) * 2.5)"
-~~~
+```
 
 > 괄호안에 이스케이프되지 않은 쌍따옴표 또는 백슬래시 그리고 캐리지 리턴과 라인 피드는 포함하지 못한다.
 
@@ -119,13 +119,13 @@ let message = "\(multiplier) times 2.5 is \(Double(multiplier) * 2.5)"
 - \0 (널 문자), \\ (백슬래시), \t (가로 탭), \n (라인 피드), \r (캐리지 리턴), \" (쌍따옴표), \’ (홑따옴표)
 - \u{n}로 쓰인 임의의 유니코드 스칼라. n은 유효한 유니코드 포인트와 같은 1-8자의 16진수.
 
-~~~ swift
+``` swift
 let wiseWords = "\"Imagination is more important than knowledge\" - Einstein"
 // "Imagination is more important than knowledge" - Einstein
 let dollarSign = "\u{24}"        // $,  Unicode scalar U+0024
 let blackHeart = "\u{2665}"      // ♥,  Unicode scalar U+2665
 let sparklingHeart = "\u{1F496}" // 💖, Unicode scalar U+1F496
-~~~
+```
 
 #### 확장 자소 클러스터(Extended Grapheme Clusters)
 
@@ -134,48 +134,48 @@ let sparklingHeart = "\u{1F496}" // 💖, Unicode scalar U+1F496
 - 예를 들어, _é_ 는 하나의 유니코드 스칼라로 표현된다(_LATIN SMALL LETTER E WITH ACUTE_ 또는 _U+00E9_). 하지만 같은 문자를 _e_ (_LATIN SMALL LETTER E_ 또는 _U+0065_)와 뒤따르는 _COMBINING ACUTE ACCENT_ (_U+0301_) 쌍으로 표현할 수 있다.
 - 두 가지 경우 모두 하나의 스위프트 _Character_ 값으로 표현된다.
 
-~~~ swift
+``` swift
 let eAcute: Character = "\u{E9}"                         // é
 let combinedEAcute: Character = "\u{65}\u{301}"          // e followed by ́
 // eAcute is é, combinedEAcute is é
-~~~
+```
 
 - 확장 자소 클러스터는 조합 문자를 하나의 _Character_ 값으로 표현한다. 예를 들어, 미리 조합된 문자와 분해된 문자 모두 하나의 스위프트 _Character_ 값으로 표현된다.
 
-~~~ swift
+``` swift
 let precomposed: Character = "\u{D55C}"                  // 한
 let decomposed: Character = "\u{1112}\u{1161}\u{11AB}"   // ᄒ, ᅡ, ᆫ
 // precomposed is 한, decomposed is 한
-~~~
+```
 
 - 확장 자소 클러스터는 스칼라를 감쌀 수도 있다.
 
-~~~ swift
+``` swift
 let enclosedEAcute: Character = "\u{E9}\u{20DD}"
 // enclosedEAcute is é⃝
-~~~
+```
 
 - 지역 표시 문자(regional indicator symbols)를 위한 유니코드 스칼라 한 쌍은 조합되어 하나의 _Character_ 값을 만든다. _REGIONAL INDICATOR SYMBOL LETTER U_ (_U+1F1FA_)와 _REGIONAL INDICATOR SYMBOL LETTER S_ (_U+1F1F8_)
 
-~~~ swift
+``` swift
 let regionalIndicatorForUS: Character = "\u{1F1FA}\u{1F1F8}"
 // regionalIndicatorForUS is 🇺🇸
-~~~
+```
 
 ### 문자 세기
 
 - 문자열의 _Character_ 값의 수를 얻기 위해 문자열의 _characters_ 프로퍼티의 _count_ 프로퍼티를 사용한다.
 
-~~~ swift
+``` swift
 let unusualMenagerie = "Koala 🐨, Snail 🐌, Penguin 🐧, Dromedary 🐪"
 println("unusualMenagerie has \(unusualMenagerie.characters.count) characters")
 // prints "unusualMenagerie has 40 characters"
-~~~
+```
 
 - 스위프트의 확장 자소 클러스터를 사용한 _Character_ 값은 문자열 덧붙이기나 변경이 항상 문자열의 길이에 영향을 주지는 않는다는 것을 의미한다.
 - 예를 들어, 4문자 단어 _cafe_ 에 _COMBINING ACUTE ACCECT_ (_U+0301_)을 끝에 덧붙이면 문자 길이는 여전히 4이다.
 
-~~~ swift
+``` swift
 var word = "cafe"
 println("the number of characters in \(word) is \(word.characters.count)")
 // prints "the number of characters in cafe is 4"
@@ -184,7 +184,7 @@ word += "\u{301}"    // COMBINING ACUTE ACCENT, U+0301
 
 println("the number of characters in \(word) is \(word.characters.count)")
 // prints "the number of characters in café is 4"
-~~~
+```
 
 > 확장 자소 클러스터는 하나 이상의 유니코드 스칼라로 조합된다. 이는 같은 문자에 대한 다른 표현을 저장하기 위한 메모리 양이 다르다는 것을 의미한다.
 > _characters_ 프로퍼티와 _NSString_ 의 _length_ 와 항상 같지 않다.
@@ -204,7 +204,7 @@ println("the number of characters in \(word) is \(word.characters.count)")
 - 문자열의 범위를 벗어난 인덱스에 접근하려고 시도하면 런타임 에러가 발생한다.
 - _String_ 의 각 인덱스에 위치한 _Character_ 에 접근하기 위해 서브스크립트 문법을 사용할 수 있다.
 
-~~~ swift
+``` swift
 let greeting = "Guten Tag"
 greeting[greeting.startIndex]
 // G
@@ -217,49 +217,49 @@ greeting[index]
 // a
 greeting[greeting.endIndex] // error
 greeting.endIndex.successor() // error
-~~~
+```
 
 - 문자열의 각각의 문자에 접근하기 위한 모든 인덱스의 _Range_ 를 만들기 위해 전역 함수 *indices(_:)* 를 사용한다.
 
-~~~ swift
+``` swift
 for index in indices(greeting) {
     print("\(greeting[index])")
 }
 print("\n")
 // prints "Guten Tag"
-~~~
+```
 
 #### 삽입과 제거
 
 - 문자열의 특정 인덱스에 문자를 삽입하기 위해, *insert(_:atIndex:)* 메소드를 사용한다.
 
-~~~ swift
+``` swift
 var welcome = "hello"
 welcome.insert("!", atIndex: welcome.endIndex)
 // welcome now equals "hello!"
-~~~
+```
 
 - 다른 문자열을 특정 인덱스에 삽입하기 위해, *splice(_:atIndex:)* 메소드를 사용한다.
 
-~~~ swift
+``` swift
 welcome.splice(" there".characters, atIndex: welcome.endIndex.predecessor())
 // welcome now equals "hello there!"
-~~~
+```
 
 - 문자열에서 특정 인덱스의 문자를 제거하기 위해, *removeAtIndex(_:)* 메소드를 사용한다.
 
-~~~ swift
+``` swift
 welcome.removeAtIndex(welcome.endIndex.predecessor())
 // welcome now equals "hello there"
-~~~
+```
 
 - 특정 범위의 문자열을 제거하기 위해, *removeRange(_:)* 메소드를 사용한다.
 
-~~~ swift
+``` swift
 let range = advance(welcome.endIndex, -6)..<welcome.endIndex
 welcome.removeRange(range)
 // welcome now equals "hello"
-~~~
+```
 
 ### 문자열 비교
 
