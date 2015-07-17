@@ -6,6 +6,8 @@ categories: swift study
 ---
 # 스위프트 스터디 1주차 (2015.07.04)
 
+**이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
+
 ## 문자열과 문자
 
 - 스위프트의 문자열은 _String_ 타입으로 표현된다.
