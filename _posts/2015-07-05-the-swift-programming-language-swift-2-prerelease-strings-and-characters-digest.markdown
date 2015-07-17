@@ -8,16 +8,16 @@ categories: swift study
 
 ## 문자열과 문자
 
-- 스위프트의 문자열은 *String* 타입으로 표현된다.
-- *String* 타입은 *Character* 타입 값의 묶음이다.
-- 스위프트의 *String* 과 *Character* 타입은 빠르고, 유니코드를 준수한다.
+- 스위프트의 문자열은 _String_ 타입으로 표현된다.
+- _String_ 타입은 _Character_ 타입 값의 묶음이다.
+- 스위프트의 _String_ 과 _Character_ 타입은 빠르고, 유니코드를 준수한다.
 - 모든 문자열은 인코딩 독립적인 유니코드로 구성되고, 다양한 유니코드 표현법으로 접근할 수 있다.
 
-> 스위프트의 *String* 타입은 파운데이션 프레임워크의 *NSString* 클래스와 호환(bridged)된다. 파운데이션 프레임워크를 사용한다면 모든 *NSString* API를 *NSString* 으로 타입 캐스트한 *String* 값에서 호출할 수 있다. 또한, 모든 *NSString* 인스턴스가 필요한 API에 *String* 값을 사용할 수 있다.
+> 스위프트의 _String_ 타입은 파운데이션 프레임워크의 _NSString_ 클래스와 호환(bridged)된다. 파운데이션 프레임워크를 사용한다면 모든 _NSString_ API를 _NSString_ 으로 타입 캐스트한 _String_ 값에서 호출할 수 있다. 또한, 모든 _NSString_ 인스턴스가 필요한 API에 _String_ 값을 사용할 수 있다.
 
 ### 문자열 리터럴
 
-- 문자열 리터럴을 통해 *String* 값을 사용할 수 있다.
+- 문자열 리터럴을 통해 _String_ 값을 사용할 수 있다.
 - 문자열 리터럴은 쌍따옴표로 둘러쌓인 연속된 문자이다.
 
 ~~~ swift
@@ -26,7 +26,7 @@ let someString = "Some string literal value"
 
 ### 빈 문자열 만들기
 
-- 빈 문자열 리터럴 또는 *String* 초기화 문법을 통해 빈 문자열을 만들 수 있다.
+- 빈 문자열 리터럴 또는 _String_ 초기화 문법을 통해 빈 문자열을 만들 수 있다.
 
 ~~~ swift
 var emptyString = ""
@@ -34,7 +34,7 @@ var anotherEmptyString = String()
 ~~~
 
 - 두 방법의 결과는 동일하다.
-- *isEmpty* 속성을 통해 *String* 값이 빈 문자열인지 확인할 수 있다.
+- _isEmpty_ 속성을 통해 _String_ 값이 빈 문자열인지 확인할 수 있다.
 
 ~~~ swift
 if emptyString.isEmpty {
@@ -44,23 +44,23 @@ if emptyString.isEmpty {
 
 ### 문자열 변수
 
-- *String* 값을 변수 또는 상수로 할당할 수 있다.
+- _String_ 값을 변수 또는 상수로 할당할 수 있다.
 
 > 두 클래스를 사용하는 오브젝티브-C를 쓰는 코코아에서와 다른 접근법이다.
 
 ### 문자열은 값 타입이다
 
-- 스위프트의 *String* 타입은 값 타입이다.
-- 새 *String* 값을 생성하면 함수 또는 메소드에 넘기거나 상수나 변수에 할당할 때 복사된 값을 넘긴다.
+- 스위프트의 _String_ 타입은 값 타입이다.
+- 새 _String_ 값을 생성하면 함수 또는 메소드에 넘기거나 상수나 변수에 할당할 때 복사된 값을 넘긴다.
 
-> 코코아에서는 동일한 *NSString* 인스턴스를 참조한다.
+> 코코아에서는 동일한 _NSString_ 인스턴스를 참조한다.
 
-- 직접 변경하지 않은 이상 *String* 값이 변경되지 않았다고 확신할 수 있다.
+- 직접 변경하지 않은 이상 _String_ 값이 변경되지 않았다고 확신할 수 있다.
 - 스위프트의 컴파일러는 반드시 복사가 필요할 때만 복사하도록 최적화한다. 이는 뛰어난 퍼포먼스를 의미한다.
 
 ### 문자 사용하기
 
-- *for-in* 루프에 *String* 값의 *characters* 프로퍼티를 넣으면 각각의 *Character* 값에 접근할 수 있다.
+- _for-in_ 루프에 _String_ 값의 _characters_ 프로퍼티를 넣으면 각각의 _Character_ 값에 접근할 수 있다.
 
 ~~~ swift
 for character in "Dog!🐶".characters {
@@ -68,12 +68,12 @@ for character in "Dog!🐶".characters {
 }
 ~~~
 
-- 단일 문자 리터럴에 *Character* 타입 주석을 붙여서 독립적인 *Character* 상수나 변수를 만들 수 있다.
-- *Character* 값의 배열을 *String* 값의 초기화 메소드에 넘겨서 *String* 값을 만들 수 있다.
+- 단일 문자 리터럴에 _Character_ 타입 주석을 붙여서 독립적인 _Character_ 상수나 변수를 만들 수 있다.
+- _Character_ 값의 배열을 _String_ 값의 초기화 메소드에 넘겨서 _String_ 값을 만들 수 있다.
 
 ### 문자열과 문자 결합하기
 
-- \+ 연산자를 사용해서 문자열을 더한 새로운 *String* 값을 만들 수 있다.
+- \+ 연산자를 사용해서 문자열을 더한 새로운 _String_ 값을 만들 수 있다.
 
 ~~~ swift
 let string1 = "hello"
@@ -82,13 +82,13 @@ var welcome = string1 + string2
 ~~~
 
 - \+= 연산자도 사용할 수 있다.
-- *String* 타입의 *append()* 메소드를 사용해서 *Character* 값을 덧붙일 수 있다.
+- _String_ 타입의 _append()_ 메소드를 사용해서 _Character_ 값을 덧붙일 수 있다.
 
-> *String* 또는 *Character* 값을 *Character* 값에 덧불일 수 없다. *Character* 값은 하나의 문자만을 포함해야하기 때문이다.
+> _String_ 또는 _Character_ 값을 _Character_ 값에 덧불일 수 없다. _Character_ 값은 하나의 문자만을 포함해야하기 때문이다.
 
 ### 문자열 삽입(interpolation)
 
-- 문자열 삽입은 상수, 변수, 리터럴, 표현식이 섞여있는 문자열 리터럴에서 새로운 *String* 값을 만들어내는 방법이다.
+- 문자열 삽입은 상수, 변수, 리터럴, 표현식이 섞여있는 문자열 리터럴에서 새로운 _String_ 값을 만들어내는 방법이다.
 - 문자열 리터럴에 백슬래시가 앞에 붙은 괄호로 둘러쌓인 값을 삽입한다.
 
 ~~~ swift
@@ -101,15 +101,15 @@ let message = "\(multiplier) times 2.5 is \(Double(multiplier) * 2.5)"
 ### 유니코드
 
 - 유니코드는 다양한 쓰기 시스템에서 인코딩, 표시하기, 텍스트 처리를 하기 위한 국제 표준이다.
-- 스위프트의 *String* 과 *Character* 타입은 완전히 유니코드를 따른다.
+- 스위프트의 _String_ 과 _Character_ 타입은 완전히 유니코드를 따른다.
 
 #### 유니코드 스칼라
 
-- 스위프트의 *String* 타입은 유니코드 스칼라 값으로 만들어졌다.
+- 스위프트의 _String_ 타입은 유니코드 스칼라 값으로 만들어졌다.
 - 유니코드 스칼라는 문자 또는 변경자를 위한 21비트 숫자이다.
 
 - 모든 21비트 유니코드 스칼라에 문자가 할당되어 있지 않다. 일부는 나중을 위해 예약되어 있다.
-- 스칼라에는 문자가 할당되어 있고 보통 *LATIN SMALL LETTER A* 같은 이름도 가지고 있다.
+- 스칼라에는 문자가 할당되어 있고 보통 _LATIN SMALL LETTER A_ 같은 이름도 가지고 있다.
 
 #### 스트링 리터럴에서의 특별한 문자
 
@@ -127,10 +127,10 @@ let sparklingHeart = "\u{1F496}" // 💖, Unicode scalar U+1F496
 
 #### 확장 자소 클러스터(Extended Grapheme Clusters)
 
-- 모든 스위프트의 *Character* 타입 인스턴스는 하나의 확장 자소 클러스터로 표현된다.
+- 모든 스위프트의 _Character_ 타입 인스턴스는 하나의 확장 자소 클러스터로 표현된다.
 - 확장 자소 클러스터는 일련의 사람이 읽을 수 있는 문자(조합되었을 때)를 제공하는 하나 이상의 유니코드 스칼라이다.
-- 예를 들어, *é* 는 하나의 유니코드 스칼라로 표현된다(*LATIN SMALL LETTER E WITH ACUTE* 또는 *U+00E9*). 하지만 같은 문자를 *e* (*LATIN SMALL LETTER E* 또는 *U+0065*)와 뒤따르는 *COMBINING ACUTE ACCENT* (*U+0301*) 쌍으로 표현할 수 있다.
-- 두 가지 경우 모두 하나의 스위프트 *Character* 값으로 표현된다.
+- 예를 들어, _é_ 는 하나의 유니코드 스칼라로 표현된다(_LATIN SMALL LETTER E WITH ACUTE_ 또는 _U+00E9_). 하지만 같은 문자를 _e_ (_LATIN SMALL LETTER E_ 또는 _U+0065_)와 뒤따르는 _COMBINING ACUTE ACCENT_ (_U+0301_) 쌍으로 표현할 수 있다.
+- 두 가지 경우 모두 하나의 스위프트 _Character_ 값으로 표현된다.
 
 ~~~ swift
 let eAcute: Character = "\u{E9}"                         // é
@@ -138,7 +138,7 @@ let combinedEAcute: Character = "\u{65}\u{301}"          // e followed by ́
 // eAcute is é, combinedEAcute is é
 ~~~
 
-- 확장 자소 클러스터는 조합 문자를 하나의 *Character* 값으로 표현한다. 예를 들어, 미리 조합된 문자와 분해된 문자 모두 하나의 스위프트 *Character* 값으로 표현된다.
+- 확장 자소 클러스터는 조합 문자를 하나의 _Character_ 값으로 표현한다. 예를 들어, 미리 조합된 문자와 분해된 문자 모두 하나의 스위프트 _Character_ 값으로 표현된다.
 
 ~~~ swift
 let precomposed: Character = "\u{D55C}"                  // 한
@@ -153,7 +153,7 @@ let enclosedEAcute: Character = "\u{E9}\u{20DD}"
 // enclosedEAcute is é⃝
 ~~~
 
-- 지역 표시 문자(regional indicator symbols)를 위한 유니코드 스칼라 한 쌍은 조합되어 하나의 *Character* 값을 만든다. *REGIONAL INDICATOR SYMBOL LETTER U* (*U+1F1FA*)와 *REGIONAL INDICATOR SYMBOL LETTER S* (*U+1F1F8*)
+- 지역 표시 문자(regional indicator symbols)를 위한 유니코드 스칼라 한 쌍은 조합되어 하나의 _Character_ 값을 만든다. _REGIONAL INDICATOR SYMBOL LETTER U_ (_U+1F1FA_)와 _REGIONAL INDICATOR SYMBOL LETTER S_ (_U+1F1F8_)
 
 ~~~ swift
 let regionalIndicatorForUS: Character = "\u{1F1FA}\u{1F1F8}"
@@ -162,7 +162,7 @@ let regionalIndicatorForUS: Character = "\u{1F1FA}\u{1F1F8}"
 
 ### 문자 세기
 
-- 문자열의 *Character* 값의 수를 얻기 위해 문자열의 *characters* 프로퍼티의 *count* 프로퍼티를 사용한다.
+- 문자열의 _Character_ 값의 수를 얻기 위해 문자열의 _characters_ 프로퍼티의 _count_ 프로퍼티를 사용한다.
 
 ~~~ swift
 let unusualMenagerie = "Koala 🐨, Snail 🐌, Penguin 🐧, Dromedary 🐪"
@@ -170,8 +170,8 @@ println("unusualMenagerie has \(unusualMenagerie.characters.count) characters")
 // prints "unusualMenagerie has 40 characters"
 ~~~
 
-- 스위프트의 확장 자소 클러스터를 사용한 *Character* 값은 문자열 덧붙이기나 변경이 항상 문자열의 길이에 영향을 주지는 않는다는 것을 의미한다.
-- 예를 들어, 4문자 단어 *cafe* 에 *COMBINING ACUTE ACCECT* (*U+0301*)을 끝에 덧붙이면 문자 길이는 여전히 4이다.
+- 스위프트의 확장 자소 클러스터를 사용한 _Character_ 값은 문자열 덧붙이기나 변경이 항상 문자열의 길이에 영향을 주지는 않는다는 것을 의미한다.
+- 예를 들어, 4문자 단어 _cafe_ 에 _COMBINING ACUTE ACCECT_ (_U+0301_)을 끝에 덧붙이면 문자 길이는 여전히 4이다.
 
 ~~~ swift
 var word = "cafe"
@@ -185,7 +185,7 @@ println("the number of characters in \(word) is \(word.characters.count)")
 ~~~
 
 > 확장 자소 클러스터는 하나 이상의 유니코드 스칼라로 조합된다. 이는 같은 문자에 대한 다른 표현을 저장하기 위한 메모리 양이 다르다는 것을 의미한다.
-> *characters* 프로퍼티와 *NSString* 의 *length* 와 항상 같지 않다.
+> _characters_ 프로퍼티와 _NSString_ 의 _length_ 와 항상 같지 않다.
 
 ### 문자열 접근과 수정
 
@@ -193,14 +193,14 @@ println("the number of characters in \(word) is \(word.characters.count)")
 
 #### 문자열 인덱스
 
-- 각각의 *String* 값은 포함하고 있는 각 *Character* 의 위치를 가리키는 *String.Index* 타입을 가지고 있다.
-- 앞서 언급한 것처럼 각 문자는 서로 다른 양의 메모리가 필요하다. 그래서 *Character* 는 각자의 위치를 결정하기 위해 *String* 의 처음부터 끝까지 반복해야 한다. 이런 이유로 스위프트의 문자열은 정수로 색인되지 않는다.
-- *startIndex* 프로퍼티는 *String* 의 첫 번째 *Character* 에 접근한다.
-- *endIndex* 프로퍼티는 마지막 문자 다음을 반환한다.
-- *String.Index* 값은 *predecessor()* 메소드를 호출해 직전 인덱스에 접근할 수 있고, *successor()* 메소드를 호출해 직후 인덱스에 접근할 수 있다.
-- *String* 의 모든 인덱스는 이들 메소드를 연결하거나 전역 함수 *advance(start:n:)* 를 사용해서 접근할 수 있다.
+- 각각의 _String_ 값은 포함하고 있는 각 _Character_ 의 위치를 가리키는 _String.Index_ 타입을 가지고 있다.
+- 앞서 언급한 것처럼 각 문자는 서로 다른 양의 메모리가 필요하다. 그래서 _Character_ 는 각자의 위치를 결정하기 위해 _String_ 의 처음부터 끝까지 반복해야 한다. 이런 이유로 스위프트의 문자열은 정수로 색인되지 않는다.
+- _startIndex_ 프로퍼티는 _String_ 의 첫 번째 _Character_ 에 접근한다.
+- _endIndex_ 프로퍼티는 마지막 문자 다음을 반환한다.
+- _String.Index_ 값은 _predecessor()_ 메소드를 호출해 직전 인덱스에 접근할 수 있고, _successor()_ 메소드를 호출해 직후 인덱스에 접근할 수 있다.
+- _String_ 의 모든 인덱스는 이들 메소드를 연결하거나 전역 함수 _advance(start:n:)_ 를 사용해서 접근할 수 있다.
 - 문자열의 범위를 벗어난 인덱스에 접근하려고 시도하면 런타임 에러가 발생한다.
-- *String* 의 각 인덱스에 위치한 *Character* 에 접근하기 위해 서브스크립트 문법을 사용할 수 있다.
+- _String_ 의 각 인덱스에 위치한 _Character_ 에 접근하기 위해 서브스크립트 문법을 사용할 수 있다.
 
 ~~~ swift
 let greeting = "Guten Tag"
@@ -217,7 +217,7 @@ greeting[greeting.endIndex] // error
 greeting.endIndex.successor() // error
 ~~~
 
-- 문자열의 각각의 문자에 접근하기 위한 모든 인덱스의 *Range* 를 만들기 위해 전역 함수 *indices(_:)* 를 사용한다.
+- 문자열의 각각의 문자에 접근하기 위한 모든 인덱스의 _Range_ 를 만들기 위해 전역 함수 *indices(_:)* 를 사용한다.
 
 ~~~ swift
 for index in indices(greeting) {
@@ -267,8 +267,8 @@ welcome.removeRange(range)
 
 - == 연산자와 != 연산자로 동일성을 확인한다.
 
-- 만약 두 *String* 값의 확장 문자 클러스터가 언어학적으로 같은 의미와 형태라면  같다고 간주한다.
-- 반대로 영어에서 사용하는 *LATIN CAPITAL LETTER A* (*U+0041* 또는 *"A"*)와 러시아어에서 사용하는 *CYRILLIC CAPITAL LETTER A* (*U+0410* 또는 *"A"*)는 같지 않다.
+- 만약 두 _String_ 값의 확장 문자 클러스터가 언어학적으로 같은 의미와 형태라면  같다고 간주한다.
+- 반대로 영어에서 사용하는 _LATIN CAPITAL LETTER A_ (_U+0041_ 또는 _"A"_)와 러시아어에서 사용하는 _CYRILLIC CAPITAL LETTER A_ (_U+0410_ 또는 _"A"_)는 같지 않다.
 
 > 스위프트의 문자열과 문자 비교는 로케일 무관하다.
 
@@ -279,15 +279,15 @@ welcome.removeRange(range)
 ### 문자열의 유니코드 표현
 
 - 유니코드 문자열이 텍스트 파일이나 다른 저장소에 쓰여질 때, 문자열의 유니코드 스칼라는 유니코드 정의 인코딩 양식 중 하나로 부호화된다.
-- 각 양식은 *코드 유닛* 으로 알려진 작은 단위로 문자열을 부호화한다.
+- 각 양식은 _코드 유닛_ 으로 알려진 작은 단위로 문자열을 부호화한다.
 - 이 양식은 UTF-8, UTF-16, UTF-32를 포함한다.
 
 - 스위프트는 문자열의 유니코드 표현에 접근하는 몇 가지 방법을 제공한다.
-- *for-in* 문에서 반복을 통해 각 확장 자소 클러스터 *Character* 값에 접근할 수 있다.
-- 다른 방법으로는 *String* 값의 세 프로퍼티를 사용한다. *utf8*, *utf16*, *utf32*
+- _for-in_ 문에서 반복을 통해 각 확장 자소 클러스터 _Character_ 값에 접근할 수 있다.
+- 다른 방법으로는 _String_ 값의 세 프로퍼티를 사용한다. _utf8_, _utf16_, _utf32_
 
 #### 유니코드 스칼라 표현
 
-- *String* 값의 *unicodeScalars* 프로퍼티를 반복해서, 유니코드 스칼라 표현에 접근할 수 있다.
-- 이 프로퍼티의 타입인 *UnicodeScalarView* 는 *UnicodeScalar* 의 값의 묶음이다.
-- 각 *UnicodeScalar* 는 *UInt32* 값으로 표현되는 스칼라의 21비트 값을 반환하는 *value* 프로퍼티를 가지고 있다.
+- _String_ 값의 _unicodeScalars_ 프로퍼티를 반복해서, 유니코드 스칼라 표현에 접근할 수 있다.
+- 이 프로퍼티의 타입인 _UnicodeScalarView_ 는 _UnicodeScalar_ 의 값의 묶음이다.
+- 각 _UnicodeScalar_ 는 _UInt32_ 값으로 표현되는 스칼라의 21비트 값을 반환하는 _value_ 프로퍼티를 가지고 있다.
