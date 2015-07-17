@@ -10,4 +10,7 @@ github_username:  ririsid
 
 # Build settings
 markdown: redcarpet
-highlighter: rouge
+highlighter: pygments
+
+redcarpet:
+  extensions: []
