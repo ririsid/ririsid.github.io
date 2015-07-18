@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "스위프트의 문자열과 문자"
-date: 2015-07-05 18:12:24
+date: 2015-07-07 23:59:45
 categories: swift study
 ---
 # 스위프트 스터디 1주차 (2015.07.04)
