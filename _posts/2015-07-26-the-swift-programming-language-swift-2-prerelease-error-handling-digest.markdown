@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "오류 처리"
+date: 2015-07-26 23:31:01
 categories: swift study
 tags: swift
 ---
@@ -69,7 +70,7 @@ func vend(itemNamed name: String) throws {
     }
 
     if amountDeposited >= item.price {
-        // Dispense the snack （スナックを配る）
+        // Dispense the snack
         amountDeposited -= item.price
         --item.count
         inventory[name] = item
