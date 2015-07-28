@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "프로퍼티"
+title: "프로퍼티 (Properties)"
 date: 2015-07-17 23:47:48
 categories: swift study
 tags: swift
@@ -9,7 +9,7 @@ tags: swift
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
 
-## 프로퍼티
+## 프로퍼티 (Properties)
 
 - 프로퍼티는 값들을 각각의 클래스, 구조체, 열거형과 결합시킨다.
 - 저장 프로퍼티(stored properties)는 상수와 변수를 인스턴스의 일부로 저장한다.

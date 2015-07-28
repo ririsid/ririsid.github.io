@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "타입 변환"
+title: "타입 변환 (Type Casting)"
 date: 2015-07-28 21:32:31
 categories: swift study
 tags: swift
@@ -9,7 +9,7 @@ tags: swift
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
 
-## 타입 변환(Type Casting)
+## 타입 변환 (Type Casting)
 
 - 타입 변환(*Type Casting*)은 인스턴스의 타입을 확인하는 방법이다. 그리고/또는, 그 인스턴스를 자신의 클래스 계층에 속한 슈퍼 클래스 또는 서브 클래스인 것처럼 속이는 것이다.
 - 스위프트에서 타입 변환은 `is` 또는 `as` 연산자를 써서 구현된다.

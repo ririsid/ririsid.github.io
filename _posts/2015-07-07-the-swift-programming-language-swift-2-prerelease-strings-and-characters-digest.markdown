@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "스위프트의 문자열과 문자"
+title: "문자열과 문자 (Strings and Characters)"
 date: 2015-07-07 23:59:45
 categories: swift study
 tags: swift
@@ -9,7 +9,7 @@ tags: swift
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
 
-## 문자열과 문자
+## 문자열과 문자 (Strings and Characters)
 
 - 스위프트의 문자열은 `String` 타입으로 표현된다.
 - `String` 타입은 `Character` 타입 값의 묶음이다.

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "오류 처리"
+title: "오류 처리 (Error Handling)"
 date: 2015-07-26 23:31:01
 categories: swift study
 tags: swift
@@ -9,7 +9,7 @@ tags: swift
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
 
-## 오류 처리
+## 오류 처리 (Error Handling)
 
 - 스위프트는 실행중(runtime)에 회복 가능한 오류(recoverable errors)를 던지고(throwing), 받고(catching), 전파하고(propagating), 조작하도록(manipulating) 돕는 퍼스트 클래스를 제공한다.
 - 어떤 함수와 메소드는 항상 실행이 완료되거나 유용한 결과를 내놓는다고 보장하지 않는다.
