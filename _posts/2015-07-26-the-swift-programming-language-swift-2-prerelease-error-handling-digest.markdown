@@ -2,7 +2,7 @@
 layout: post
 title: "오류 처리 (Error Handling)"
 date: 2015-07-26 23:31:01
-categories: swift study
+categories: swift
 tags: swift
 ---
 # 스위프트 스터디 5주차 (2015.08.01)

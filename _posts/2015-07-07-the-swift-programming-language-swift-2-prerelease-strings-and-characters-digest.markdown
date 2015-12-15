@@ -2,7 +2,7 @@
 layout: post
 title: "문자열과 문자 (Strings and Characters)"
 date: 2015-07-07 23:59:45
-categories: swift study
+categories: swift
 tags: swift
 ---
 # 스위프트 스터디 1주차 (2015.07.04)

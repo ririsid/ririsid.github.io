@@ -2,7 +2,7 @@
 layout: post
 title: "타입 변환 (Type Casting)"
 date: 2015-07-28 21:32:31
-categories: swift study
+categories: swift
 tags: swift
 ---
 # 스위프트 스터디 5주차 (2015.08.01)
