@@ -80,6 +80,6 @@ originalItems = [originalItems filteredArrayUsingPredicate:predicate];
 가능하다!
 
 ### 참고
-- http://stackoverflow.com/questions/111866/best-way-to-remove-from-nsmutablearray-while-iterating
-- http://stackoverflow.com/questions/1728475/nsarray-remove-item-from-array
-- http://stackoverflow.com/questions/19676371/how-to-filter-nsarray-using-predicate-on-an-object-property
+- [http://stackoverflow.com/questions/111866/best-way-to-remove-from-nsmutablearray-while-iterating](http://stackoverflow.com/questions/111866/best-way-to-remove-from-nsmutablearray-while-iterating)
+- [http://stackoverflow.com/questions/1728475/nsarray-remove-item-from-array](http://stackoverflow.com/questions/1728475/nsarray-remove-item-from-array)
+- [http://stackoverflow.com/questions/19676371/how-to-filter-nsarray-using-predicate-on-an-object-property](http://stackoverflow.com/questions/19676371/how-to-filter-nsarray-using-predicate-on-an-object-property)
