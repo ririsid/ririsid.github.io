@@ -2,7 +2,6 @@
 layout: post
 title: "프로퍼티 (Properties)"
 date: 2015-07-17 23:47:48
-categories: swift
 tags: swift
 ---
 # 스위프트 스터디 3주차 (2015.07.18)
