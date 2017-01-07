@@ -1,9 +1,10 @@
 ---
 layout: post
 title: "타입 변환 (Type Casting)"
-date: 2015-07-28 21:32:31
 tags: swift
+date: 2015-07-28 21:32:31
 ---
+
 # 스위프트 스터디 5주차 (2015.08.01)
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**

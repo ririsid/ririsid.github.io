@@ -1,9 +1,10 @@
 ---
 layout: post
 title: "프로퍼티 (Properties)"
-date: 2015-07-17 23:47:48
 tags: swift
+date: 2015-07-17 23:47:48
 ---
+
 # 스위프트 스터디 3주차 (2015.07.18)
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
