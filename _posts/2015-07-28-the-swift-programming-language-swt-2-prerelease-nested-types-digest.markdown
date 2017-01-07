@@ -18,7 +18,7 @@ tags: swift
 
 ### 중첩 타입 사용 (Nested Types in Action)
 
-``` swift
+```swift
 struct BlackjackCard {
 
     // nested Suit enumeration
@@ -58,7 +58,7 @@ struct BlackjackCard {
 }
 ```
 
-``` swift
+```swift
 let theAceOfSpades = BlackjackCard(rank: .Ace, suit: .Spades)
 print("theAceOfSpades: \(theAceOfSpades.description)")
 // prints "theAceOfSpades: suit is ♠, value is 1 or 11"
@@ -68,7 +68,7 @@ print("theAceOfSpades: \(theAceOfSpades.description)")
 
 - 정의된 문맥 밖에서 중첩 타입을 사용하려면, 이름 앞에 그것을 포함하고 있는 타입의 이름을 놓는다.
 
-``` swift
+```swift
 let heartsSymbol = BlackjackCard.Suit.Hearts.rawValue
 // heartsSymbol is "♡"
 ```

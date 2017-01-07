@@ -39,7 +39,7 @@ tags: swift
 - 또한, 사용하지 않거나 필요 없을 지도 모르면서 비싼 댓가를 치뤄야하는 프로퍼티를 초기화할 때도 유용하다.
 - 다음 예제에서 `DataImporter` 는 초기화되지 않는다.
 
-``` swift
+```swift
 class DataImporter {
     /*
     DataImporter is a class to import data from an external file.
@@ -63,7 +63,7 @@ manager.data.append("Some more data")
 
 - 다음과 같이 접근하게 되면 초기화된다.
 
-``` swift
+```swift
 print(manager.importer.fileName)
 // the DataImporter instance for the importer property has now been created
 // prints "data.txt"
@@ -80,7 +80,7 @@ print(manager.importer.fileName)
 
 - 계산 프로퍼티는 값을 진짜로 저장하지 않는다. 대신, 간접적으로 다른 프로퍼티와 값을 사용할 수 있도록 게터와 세터를 제공한다.
 
-``` swift
+```swift
 struct Point {
     var x = 0.0, y = 0.0
 }
@@ -114,7 +114,7 @@ print("square.origin is now at (\(square.origin.x), \(square.origin.y))")
 
 - 세터는 설정하기 위한 값의 이름을 지정하지 않으면, 기본 값으로 `newValue` 를 사용한다.
 
-``` swift
+```swift
 struct AlternativeRect {
     var origin = Point()
     var size = Size()
@@ -140,7 +140,7 @@ struct AlternativeRect {
 
 - 읽기전용 계산 프로퍼티는 `get` 키워드를 생략할 수 있다.
 
-``` swift
+```swift
 struct Cuboid {
     var width = 0.0, height = 0.0, depth = 0.0
     var volume: Double {
@@ -169,7 +169,7 @@ print("the volume of fourByFiveByTwo is \(fourByFiveByTwo.volume)")
 
 > `willSet` 과 `didSet` 옵저버는 위임되지 않은 생성자(initializer)에서는 호출되지 않는다.
 
-``` swift
+```swift
 class StepCounter {
     var totalSteps: Int = 0 {
         willSet(newTotalSteps) {
@@ -214,7 +214,7 @@ stepCounter.totalSteps = 896
 - `static` 키워드를 사용해서 타입 프로퍼티를 정의한다.
 - 클래스의 계산 타입 프로퍼티는 하위 클래스에서 재정의할 수 있도록 `static` 대신 `class` 키워드를 사용할 수 있다.
 
-``` swift
+```swift
 struct SomeStructure {
     static var storedTypeProperty = "Some value."
     static var computedTypeProperty: Int {
@@ -245,7 +245,7 @@ class SomeClass {
 - 타입 프로퍼티는 인스턴스 프로퍼티와 마찬가지로 닷(.) 문법을 통해 읽고 쓸 수 있다.
 - 하지만 타입 프로퍼티는 인스턴스가 아닌 타입에 읽고 쓴다.
 
-``` swift
+```swift
 print(SomeStructure.storedTypeProperty)
 // prints "Some value."
 SomeStructure.storedTypeProperty = "Another value."

@@ -17,7 +17,7 @@ tags: swift
 
 ### 타입 변환을 위한 클래스 계층 선언
 
-``` swift
+```swift
 class MediaItem {
     var name: String
     init(name: String) {
@@ -26,7 +26,7 @@ class MediaItem {
 }
 ```
 
-``` swift
+```swift
 class Movie: MediaItem {
     var director: String
     init(name: String, director: String) {
@@ -44,7 +44,7 @@ class Song: MediaItem {
 }
 ```
 
-``` swift
+```swift
 let library = [
     Movie(name: "Casablanca", director: "Michael Curtiz"),
     Song(name: "Blue Suede Shoes", artist: "Elvis Presley"),
@@ -65,7 +65,7 @@ let library = [
 - 타입 확인 연산자 (`is`)를 사용해 인스턴스가 특정 서브클래스인지 확인한다.
 - 타입 확인 연산자는 인스턴스가 특정 서브클래스면 `true`를 반환하고, 아니면 `false` 를 반환한다.
 
-``` swift
+```swift
 var movieCount = 0
 var songCount = 0
 
@@ -91,7 +91,7 @@ print("Media library contains \(movieCount) movies and \(songCount) songs")
 - 다운캐스트가 성공할 지 확실하지 않을 때는 조건 형식 `as?`를 사용하라. 다운캐스트가 불가능할 때 그 값은 `nil`이 될 것이다.
 - 다운캐스트가 항상 성공할 때만 강제 형식 `as!`를 사용하라. 잘못된 타입으로 다운캐스트를 시도하면 런타임 에러가 발생한다.
 
-``` swift
+```swift
 for item in library {
     if let movie = item as? Movie {
         print("Movie: '\(movie.name)', dir. \(movie.director)")
@@ -123,7 +123,7 @@ for item in library {
 - 하지만 때로는 제공된 API에 관한 정보를 통해 각 배열에 포함된 객체의 타입을 확신할 수 있다.
 - 이런 경우, 강제 타입 변환 연산자 (`as`) 를 사용해서 옵셔널 언래핑(optional unwrapping)을 사용하지 않고, 배열 안의 각 아이템을 `AnyObject` 보다 더 정확한 클래스 타입으로 다운캐스트 할 수 있다.
 
-``` swift
+```swift
 let someObjects: [AnyObject] = [
     Movie(name: "2001: A Space Odyssey", director: "Stanley Kubrick"),
     Movie(name: "Moon", director: "Duncan Jones"),
@@ -131,7 +131,7 @@ let someObjects: [AnyObject] = [
 ]
 ```
 
-``` swift
+```swift
 for object in someObjects {
     let movie = object as! Movie
     print("Movie: '\(movie.name)', dir. \(movie.director)")
@@ -141,7 +141,7 @@ for object in someObjects {
 // Movie: 'Alien', dir. Ridley Scott
 ```
 
-``` swift
+```swift
 for movie in someObjects as! [Movie] {
     print("Movie: '\(movie.name)', dir. \(movie.director)")
 }
@@ -154,7 +154,7 @@ for movie in someObjects as! [Movie] {
 
 - `Any` 를 사용해서 함수 타입과 클래스가 아닌 타입을 포함한 복합 타입으로 작업할 수 있다.
 
-``` swift
+```swift
 var things = [Any]()
 
 things.append(0)
@@ -169,7 +169,7 @@ things.append({ (name: String) -> String in "Hello, \(name)" })
 
 - `switch` 문의 케이스(case)에서 `is` 와 `as` 연산자를 사용해서 `Any` 혹은 `AnyObject` 타입으로만 알고 있는 상수나 변수의 지정 타입을 알 수 있다.
 
-``` swift
+```swift
 
 for thing in things {
     switch thing {
