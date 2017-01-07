@@ -4,6 +4,8 @@ title: "문자열과 문자 (Strings and Characters)"
 date: 2015-07-07 23:59:45
 tags: swift
 ---
+@import "{{ site.theme }}";
+
 # 스위프트 스터디 1주차 (2015.07.04)
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
