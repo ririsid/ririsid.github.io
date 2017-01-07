@@ -1,8 +1,9 @@
 # Site settings
-title: RiRi at Creai
-email: riri@creai.net
+theme: jekyll-theme-cayman
+title: "RiRi at Creai"
 description: "개발하며 배운 것들. #iOS #Objective-C #Swift"
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://riri.creai.net" # the base hostname & protocol for your site
+url: http://riri.creai.net # the base hostname & protocol for your site
+email: riri@creai.net
 twitter_username: ririsid
 github_username: ririsid
+google_analytics: UA-89960156-1
