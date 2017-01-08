@@ -69,7 +69,7 @@ originalItems = originalItems.filter { $0.characters.count <= 4 }
 
 ## 다시 오브젝티브-C
 
-스위프트의 필터 방식을 오브젝티브-C에서 사용할 수 있을까?
+스위프트에서 사용한 함수형 코드를 오브젝티브-C에서 사용할 수 있을까?
 
 ```objective-c
 NSArray<NSString *> *originalItems = @[@"Sam", @"John", @"Kevin", @"William"];
