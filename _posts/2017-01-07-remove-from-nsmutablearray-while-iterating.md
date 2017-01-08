@@ -65,11 +65,11 @@ var originalItems = ["Sam", "John", "Kevin", "William"]
 originalItems = originalItems.filter { $0.characters.count <= 4 }
 ```
 
-`filter` 메소드를 사용하면 직관적인 코드를 작성할 수 있다.
+`filter` 메소드를 통해 함수형 기법을 사용하면 보다 직관적인 코드를 작성할 수 있다.
 
 ## 다시 오브젝티브-C
 
-스위프트에서 사용한 함수형 코드를 오브젝티브-C에서 사용할 수 있을까?
+스위프트에서 사용한 함수형 기법을 오브젝티브-C에서도 사용할 수 있을까?
 
 ```objective-c
 NSArray<NSString *> *originalItems = @[@"Sam", @"John", @"Kevin", @"William"];
