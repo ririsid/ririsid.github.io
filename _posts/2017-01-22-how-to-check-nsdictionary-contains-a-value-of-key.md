@@ -81,7 +81,7 @@ let key = "John"
 if married[key] != nil {
     print("\(key) is a member.")
 } else {
-    print("\(key) is a not member.")
+    print("\(key) is not a member.")
 }
 ```
 
@@ -97,11 +97,11 @@ let key = "John"
 if let value = married[key], value != nil {
     print("\(key) is a member.")
 } else {
-    print("\(key) is a not member.")
+    print("\(key) is not a member.")
 }
 ```
 
-이제 결과는 _John is a not member._ 가 되었다.
+이제 결과는 _John is not a member._ 가 되었다.
 
 ### 참고
 - [http://stackoverflow.com/questions/2784648/how-to-check-if-an-nsdictionary-or-nsmutabledictionary-contains-a-key](http://stackoverflow.com/questions/2784648/how-to-check-if-an-nsdictionary-or-nsmutabledictionary-contains-a-key)
