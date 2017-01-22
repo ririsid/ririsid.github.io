@@ -89,11 +89,7 @@ if married[key] != nil {
 문제가 뭘까? `married`의 타입을 확인하면 `[String : Bool?]`이다. 값이 옵셔널 `Bool`이기 때문에 문제가 생겼다. 옵셔널을 언랩 해야만 원하는 결과를 얻을 수 있다.
 
 ```swift
-let married = ["Sam": true,
-               "John": nil,
-               "Kevin": true,
-               "William": false]
-let key = "John"
+// 중복 코드 생략
 if let value = married[key], value != nil {
     print("\(key) is a member.")
 } else {
