@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "NSDictionary가 키를 포함하는지 확인하기"
-tags: objective-c
+title: "NSDictionary의 키에 값이 있는지 확인하기"
+tags: objective-c swift
 date: 2017-01-22 16:25:00
 ---
 
-오브젝티브-C에서 `NSDictionary`가 특정 키를 포함하는지 확인해야할 때가 있다.
-주로 서버에서 가져온 JSON 데이터에서 값을 추출할 때 많이 사용했다.
+오브젝티브-C에서 `NSDictionary`의 특정 키에 해당하는 값이 있는지 확인해야 할 때가 있다.
+주로 서버에서 가져온 JSON 데이터에서 값을 추출할 때 많이 필요하다.
 
 전통적인 권장 방법은 `objectForKey` 메소드를 사용하는 것이다.
 
@@ -25,7 +25,7 @@ if ([married objectForKey:key]) {
 }
 ```
 
-이 방법을 사용하면 크래시 없이 키를 포함하는 지 확인할 수 있다.
+이 방법을 사용하면 크래시 없이 키에 값이 있는지 확인할 수 있다.
 현대적인 오브젝티브-C에서는 서브크립팅(`[]`) 문법으로 조금 더 편하게 사용할 수 있다.
 
 ```objective-c
@@ -41,7 +41,7 @@ if (married[key]) {
 
 첫 예제와 같은 동작을 하는 코드로 문법만 다르기 때문에 마찬가지로 크래시 없이 사용할 수 있다.
 
-## JSON 데이터와 `NSNull`
+## JSON 데이터와 NSNull
 
 다만, JSON 데이터를 받을 때 의도와 다른 경우가 발생할 수 있다.
 `NSDictionary`는 `nil`을 값으로 가질 수 없기 때문에 키는 있고 값이 없는 경우, `[NSNull null]`이 값으로 할당되고는 한다.
