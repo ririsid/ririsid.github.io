@@ -1,9 +1,9 @@
 # Site settings
 theme: jekyll-theme-cayman
-title: "RiRi at Creai"
-description: "개발하며 배운 것들. #iOS #Objective-C #Swift"
-url: http://riri.creai.net # the base hostname & protocol for your site
-email: riri@creai.net
+title: "RiRi's Optional Unwrapping"
+description: "개발하며 배운 것들. #iOS #Swift #Objective-C"
+url: http://ririsid.github.io # the base hostname & protocol for your site
+email: ririsid@me.com
 twitter_username: ririsid
 github_username: ririsid
 google_analytics: UA-65284242-1
