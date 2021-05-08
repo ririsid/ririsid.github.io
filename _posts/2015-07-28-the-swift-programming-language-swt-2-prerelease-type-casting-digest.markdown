@@ -1,10 +1,9 @@
 ---
 layout: post
-title: "타입 변환 (Type Casting)"
-tags: swift
-date: 2015-07-28 21:32:31
+title:  "타입 변환 (Type Casting)"
+date:   2015-07-28 21:32:31 +0900
+tags:   swift
 ---
-
 # 스위프트 스터디 5주차 (2015.08.01)
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
@@ -17,16 +16,16 @@ date: 2015-07-28 21:32:31
 
 ### 타입 변환을 위한 클래스 계층 선언
 
-```swift
+{% highlight swift %}
 class MediaItem {
     var name: String
     init(name: String) {
         self.name = name
     }
 }
-```
+{% endhighlight %}
 
-```swift
+{% highlight swift %}
 class Movie: MediaItem {
     var director: String
     init(name: String, director: String) {
@@ -42,9 +41,9 @@ class Song: MediaItem {
         super.init(name: name)
     }
 }
-```
+{% endhighlight %}
 
-```swift
+{% highlight swift %}
 let library = [
     Movie(name: "Casablanca", director: "Michael Curtiz"),
     Song(name: "Blue Suede Shoes", artist: "Elvis Presley"),
@@ -53,7 +52,7 @@ let library = [
     Song(name: "Never Gonna Give You Up", artist: "Rick Astley")
 ]
 // the type of "library" is inferred to be [MediaItem]
-```
+{% endhighlight %}
 
 - 스위프트의 타입 체커(type checker)는 `Movie` 와 `Song` 가 공통 슈퍼 클래스인 `MediaItem` 을 가지고 있다고 추정할 수 있고, `library` 를 `[MediaItem]` 으로 추론한다.
 - `library` 에 있는 아이템들은 여전히 `Movie` 와 `Song` 인스턴스다.
@@ -65,7 +64,7 @@ let library = [
 - 타입 확인 연산자 (`is`)를 사용해 인스턴스가 특정 서브클래스인지 확인한다.
 - 타입 확인 연산자는 인스턴스가 특정 서브클래스면 `true`를 반환하고, 아니면 `false` 를 반환한다.
 
-```swift
+{% highlight swift %}
 var movieCount = 0
 var songCount = 0
 
@@ -79,7 +78,7 @@ for item in library {
 
 print("Media library contains \(movieCount) movies and \(songCount) songs")
 // prints "Media library contains 2 movies and 3 songs"
-```
+{% endhighlight %}
 
 ### 다운캐스팅(Downcasting)
 
@@ -91,7 +90,7 @@ print("Media library contains \(movieCount) movies and \(songCount) songs")
 - 다운캐스트가 성공할 지 확실하지 않을 때는 조건 형식 `as?`를 사용하라. 다운캐스트가 불가능할 때 그 값은 `nil`이 될 것이다.
 - 다운캐스트가 항상 성공할 때만 강제 형식 `as!`를 사용하라. 잘못된 타입으로 다운캐스트를 시도하면 런타임 에러가 발생한다.
 
-```swift
+{% highlight swift %}
 for item in library {
     if let movie = item as? Movie {
         print("Movie: '\(movie.name)', dir. \(movie.director)")
@@ -105,7 +104,7 @@ for item in library {
 // Movie: 'Citizen Kane', dir. Orson Welles
 // Song: 'The One And Only', by Chesney Hawkes
 // Song: 'Never Gonna Give You Up', by Rick Astley
-```
+{% endhighlight %}
 
 > 변환(casting)은 인스턴스나 그 값을 실제로 변경하지 않는다. 기저의 인스턴스는 그대로 있고, 단순히 타입의 인스턴스로 속이고 접근한다.
 
@@ -123,15 +122,15 @@ for item in library {
 - 하지만 때로는 제공된 API에 관한 정보를 통해 각 배열에 포함된 객체의 타입을 확신할 수 있다.
 - 이런 경우, 강제 타입 변환 연산자 (`as`) 를 사용해서 옵셔널 언래핑(optional unwrapping)을 사용하지 않고, 배열 안의 각 아이템을 `AnyObject` 보다 더 정확한 클래스 타입으로 다운캐스트 할 수 있다.
 
-```swift
+{% highlight swift %}
 let someObjects: [AnyObject] = [
     Movie(name: "2001: A Space Odyssey", director: "Stanley Kubrick"),
     Movie(name: "Moon", director: "Duncan Jones"),
     Movie(name: "Alien", director: "Ridley Scott")
 ]
-```
+{% endhighlight %}
 
-```swift
+{% highlight swift %}
 for object in someObjects {
     let movie = object as! Movie
     print("Movie: '\(movie.name)', dir. \(movie.director)")
@@ -139,22 +138,22 @@ for object in someObjects {
 // Movie: '2001: A Space Odyssey', dir. Stanley Kubrick
 // Movie: 'Moon', dir. Duncan Jones
 // Movie: 'Alien', dir. Ridley Scott
-```
+{% endhighlight %}
 
-```swift
+{% highlight swift %}
 for movie in someObjects as! [Movie] {
     print("Movie: '\(movie.name)', dir. \(movie.director)")
 }
 // Movie: '2001: A Space Odyssey', dir. Stanley Kubrick
 // Movie: 'Moon', dir. Duncan Jones
 // Movie: 'Alien', dir. Ridley Scott
-```
+{% endhighlight %}
 
 #### Any
 
 - `Any` 를 사용해서 함수 타입과 클래스가 아닌 타입을 포함한 복합 타입으로 작업할 수 있다.
 
-```swift
+{% highlight swift %}
 var things = [Any]()
 
 things.append(0)
@@ -165,11 +164,11 @@ things.append("hello")
 things.append((3.0, 5.0))
 things.append(Movie(name: "Ghostbusters", director: "Ivan Reitman"))
 things.append({ (name: String) -> String in "Hello, \(name)" })
-```
+{% endhighlight %}
 
 - `switch` 문의 케이스(case)에서 `is` 와 `as` 연산자를 사용해서 `Any` 혹은 `AnyObject` 타입으로만 알고 있는 상수나 변수의 지정 타입을 알 수 있다.
 
-```swift
+{% highlight swift %}
 
 for thing in things {
     switch thing {
@@ -204,6 +203,6 @@ for thing in things {
 // an (x, y) point at 3.0, 5.0
 // a movie called 'Ghostbusters', dir. Ivan Reitman
 // Hello, Michael
-```
+{% endhighlight %}
 
 > `switch` 문의 케이스는 타입을 확인하고 변환하기 위해 강제 타입 변환 연산자 (`as`, `as?` 아님) 를 사용합니다. 이 방법은 `switch` 케이스 문의 문맥 안에서 항상 안전합니다.

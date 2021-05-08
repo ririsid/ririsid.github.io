@@ -1,10 +1,9 @@
 ---
 layout: post
-title: "중첩 타입 (Nested Types)"
-tags: swift
-date: 2015-07-28 23:13:14
+title:  "중첩 타입 (Nested Types)"
+date:   2015-07-28 23:13:14 +0900
+tags:   swift
 ---
-
 # 스위프트 스터디 5주차 (2015.08.01)
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
@@ -18,7 +17,7 @@ date: 2015-07-28 23:13:14
 
 ### 중첩 타입 사용 (Nested Types in Action)
 
-```swift
+{% highlight swift %}
 struct BlackjackCard {
 
     // nested Suit enumeration
@@ -56,19 +55,19 @@ struct BlackjackCard {
         return output
     }
 }
-```
+{% endhighlight %}
 
-```swift
+{% highlight swift %}
 let theAceOfSpades = BlackjackCard(rank: .Ace, suit: .Spades)
 print("theAceOfSpades: \(theAceOfSpades.description)")
 // prints "theAceOfSpades: suit is ♠, value is 1 or 11"
-```
+{% endhighlight %}
 
 ### 중첩 타입 참조 (Referring to Nested Types)
 
 - 정의된 문맥 밖에서 중첩 타입을 사용하려면, 이름 앞에 그것을 포함하고 있는 타입의 이름을 놓는다.
 
-```swift
+{% highlight swift %}
 let heartsSymbol = BlackjackCard.Suit.Hearts.rawValue
 // heartsSymbol is "♡"
-```
+{% endhighlight %}

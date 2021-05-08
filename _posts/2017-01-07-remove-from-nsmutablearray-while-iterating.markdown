@@ -1,14 +1,13 @@
 ---
 layout: post
-title: "NSMutableArray를 반복하며 객체 제거하기"
-tags: objective-c swift
-date: 2017-01-07 19:54:51
+title:  "NSMutableArray를 반복하며 객체 제거하기"
+date:   2017-01-07 19:54:51 +0900
+tags:   objective-c swift
 ---
-
 오브젝티브-C에서 배열을 반복하면서 조건에 따라 일부 객체를 제거해야할 때가 있다.
 우선 배열을 `NSMutableArray`로 만들고, `for-in`문을 통해 바로 조건에 맞지 않는 객체를 제거하려고 했다.
 
-```objective-c
+{% highlight objc %}
 NSArray<NSString *> *originalItems = @[@"Sam", @"John", @"Kevin", @"William"];
 NSMutableArray<NSString *> *copiedItems = originalItems.mutableCopy;
 for (NSString *item in copiedItems) {
@@ -17,13 +16,13 @@ for (NSString *item in copiedItems) {
         [copiedItems removeObject:item];
     }
 }
-```
+{% endhighlight %}
 
 이 코드를 실행하면 크래시가 발생한다. **콜렉션 타입이 반복중에 변경** 되었기 때문이다.
 그래서 반복중에 변경하지 않는 방법으로 다시 만들었다.
 조건에 맞지 않는 객체를 제거하지 않고, 반대로 조건에 맞는 객체만 새 배열에 저장해서 사용했다.
 
-```objective-c
+{% highlight objc %}
 NSArray<NSString *> *originalItems = @[@"Sam", @"John", @"Kevin", @"William"];
 NSMutableArray<NSString *> *newItems = [NSMutableArray new];
 for (NSString *item in originalItems) {
@@ -33,12 +32,12 @@ for (NSString *item in originalItems) {
     }
 }
 originalItems = [NSArray arrayWithArray:newItems];
-```
+{% endhighlight %}
 
 이 방법은 잘 동작하며, 현재 사용중인 방법이다.
 하지만 글을 작성하면서 _이 방법이 최선일까?_ 하는 생각이 들어 검색해봤다.
 
-```objective-c
+{% highlight objc %}
 NSArray<NSString *> *originalItems = @[@"Sam", @"John", @"Kevin", @"William"];
 NSMutableArray<NSString *> *discardedItems = [NSMutableArray new];
 for (NSString *item in originalItems) {
@@ -50,7 +49,7 @@ for (NSString *item in originalItems) {
 NSMutableArray<NSString *> *copiedItems = originalItems.mutableCopy;
 [copiedItems removeObjectsInArray:discardedItems];
 originalItems = [NSArray arrayWithArray:copiedItems];
-```
+{% endhighlight %}
 
 새 방법은 제거할 아이템 배열을 만들고, `removeObjectsInArray:` 메소드를 사용해서 한꺼번에 제거한다.
 코드는 조금 길어졌지만 의도가 좀 더 잘 반영된 코드다.
@@ -60,10 +59,10 @@ originalItems = [NSArray arrayWithArray:copiedItems];
 
 스위프트에서는 어떻게 할까?
 
-```swift
+{% highlight swift %}
 var originalItems = ["Sam", "John", "Kevin", "William"]
 originalItems = originalItems.filter { $0.characters.count <= 4 }
-```
+{% endhighlight %}
 
 `filter` 메소드를 통해 함수형 기법을 사용하면 보다 직관적인 코드를 작성할 수 있다.
 
@@ -71,11 +70,11 @@ originalItems = originalItems.filter { $0.characters.count <= 4 }
 
 스위프트에서 사용한 함수형 기법을 오브젝티브-C에서도 사용할 수 있을까?
 
-```objective-c
+{% highlight objc %}
 NSArray<NSString *> *originalItems = @[@"Sam", @"John", @"Kevin", @"William"];
 NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.length <= 4"];
 originalItems = [originalItems filteredArrayUsingPredicate:predicate];
-```
+{% endhighlight %}
 
 가능하다!
 

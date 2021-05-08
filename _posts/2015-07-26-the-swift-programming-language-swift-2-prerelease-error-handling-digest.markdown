@@ -1,10 +1,9 @@
 ---
 layout: post
-title: "오류 처리 (Error Handling)"
-tags: swift
-date: 2015-07-26 23:31:01
+title:  "오류 처리 (Error Handling)"
+date:   2015-07-26 23:31:01 +0900
+tags:   swift
 ---
-
 # 스위프트 스터디 5주차 (2015.08.01)
 
 **이 문서는 Apple의 _The Swift Programming Language (Swift 2 Prerelease)_ 의 요약입니다.**
@@ -25,13 +24,13 @@ date: 2015-07-26 23:31:01
 - 이는 스위프트 열거형이 `ErrorType` 을 채용하면, 컴파일러에 의해 합성된 구현을 자동으로 가지기 때문이다.
 - 다음은 자판기의 오류 상태의 표현의 예제다.
 
-```swift
+{% highlight swift %}
 enum VendingMachineError: ErrorType {
     case InvalidSelection
     case InsufficientFunds(required: Double)
     case OutOfStock
 }
-```
+{% endhighlight %}
 
 ### 오류 던지기(Throwing Errors)
 
@@ -39,15 +38,15 @@ enum VendingMachineError: ErrorType {
 - 반환형이 있으면 `throws` 키워드를 반환 화살표 (->) 전에 적어야 한다.
 - 함수, 메소드, 클로저는 명시적으로 표시하지 않으면 오류를 던질 수 없다.
 
-```swift
+{% highlight swift %}
 func canThrowErrors() throws -> String
 
 func cannotThrowErrors() -> String
-```
+{% endhighlight %}
 
 - 던지는 함수(throwing function)의 본문 어디서나 `throw` 구문을 써서 오류를 던질 수 있다.
 
-```swift
+{% highlight swift %}
 struct Item {
     var price: Double
     var count: Int
@@ -79,9 +78,9 @@ func vend(itemNamed name: String) throws {
         throw VendingMachineError.InsufficientFunds(required: amountRequired)
     }
 }
-```
+{% endhighlight %}
 
-```swift
+{% highlight swift %}
 let favoriteSnacks = [
     "Alice": "Chips",
     "Bob": "Licorice",
@@ -91,20 +90,20 @@ func buyFavoriteSnack(person: String) throws {
     let snackName = favoriteSnacks[person] ?? "Candy Bar"
     try vend(itemNamed: snackName)
 }
-```
+{% endhighlight %}
 
 ### 오류 받고 처리하기(Catching and Handling Errors)
 
 - `do-catch` 문을 사용해서 오류를 받고 처리할 수 있다.
 
-```swift
+{% highlight swift %}
 do {
     try function that throws
     statements
 } catch pattern {
     statements
 }
-```
+{% endhighlight %}
 
 - 오류가 던져지면 오류는 `catch` 절을 만날 때까지 바깥 스코프로 전파된다.
 - `switch` 문처럼 컴파일러는 `catch` 절이 완전한지 추론한다. 그렇게 판단하면 오류가 관리되고 있다고 간주한다.
@@ -112,7 +111,7 @@ do {
 - 오류가 처리되는 것을 보장하기 위해, 모든 오류에 대응하는 패턴으로 `catch` 절을 사용한다.
 - 만약 `catch` 절이 패턴을 특징 짓지 않는다면, 모든 오류를 `error` 라는 이름의 지역 변수로 연결한다.
 
-```swift
+{% highlight swift %}
 do {
     try vend(itemNamed: "Candy Bar")
     // Enjoy delicious snack
@@ -123,7 +122,7 @@ do {
 } catch VendingMachineError.InsufficientFunds(let amountRequired) {
     print("Insufficient funds. Please insert an additional $\(amountRequired).")
 }
-```
+{% endhighlight %}
 
 - 위 예제에서 `vend(itemNamed:)` 는 오류를 던질 수 있기 때문에 `try` 표현식으로 호출된다.
 - 오류가 던져지면, 실행(execution)은 즉시 `catch` 절로 전달되고, 전파를 계속할 지 결정한다.
@@ -135,7 +134,7 @@ do {
 - `try!`를 써서 던지기 함수나 메소드를 호출하면, 오류 전파를 막고, 실행 중에 오류가 던져지지 않는다고 포장한다.
 - 실제로 오류가 던져지면 런타임 오류가 발생한다.
 
-```swift
+{% highlight swift %}
 func willOnlyThrowIfTrue(value: Bool) throws {
     if value { throw someError }
 }
@@ -147,7 +146,7 @@ do {
 }
 
 try! willOnlyThrowIfTrue(false)
-```
+{% endhighlight %}
 
 #### 정리(Clean-Up) 행동 지정
 
@@ -158,7 +157,7 @@ try! willOnlyThrowIfTrue(false)
 - 지연된 구문은 `break` 나 `return` 문 또는 오류를 던지는 것과 같이 문장 밖으로 제어를 넘기는 코드를 포함하지 않는다.
 - 지연된 행동은 기술된 순서의 반대로 실행된다. 첫 번째 `defer` 문이 두 번째 `defer` 문 다음에 실행된다.
 
-```swift
+{% highlight swift %}
 func processFile(filename: String) throws {
     if exists(filename) {
         let file = open(filename)
@@ -171,7 +170,7 @@ func processFile(filename: String) throws {
         // close(file) is called here, at the end of the scope.
     }
 }
-```
+{% endhighlight %}
 
 - 위 예제에서 `defer` 문을 써서 `open(_:)` 문이 대응하는 `close(_:)` 문이 호출되는 것을 보장한다.
 - 이 호출은 오류가 던져지든 않든 상관 없다.
