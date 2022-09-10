@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: RiRi's Optional Unwrapping
+title: Optional Unwrapping
 # email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
   개발하며 배운 것들. #iOS #Swift #Objective-C
