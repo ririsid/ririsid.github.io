@@ -28,7 +28,9 @@ if let language = recognizer.dominantLanguage {
 
 출력 결과는 다음과 같다.
 
-> en
+```plaintext
+en
+```
 
 ### 가능한 언어 목록
 
@@ -43,7 +45,9 @@ print(hypotheses)
 
 출력 결과는 다음과 같다.
 
-> [__C.NLLanguage(_rawValue: en): 0.7789781093597412, __C.NLLanguage(_rawValue: de): 0.13277797400951385]
+```swift
+[__C.NLLanguage(_rawValue: en): 0.7789781093597412, __C.NLLanguage(_rawValue: de): 0.13277797400951385]
+```
 
 ### 제약 추가
 
@@ -68,7 +72,9 @@ print(constrainedHypotheses)
 
 출력 결과는 다음과 같다.
 
-> [__C.NLLanguage(_rawValue: de): 0.13059720396995544, __C.NLLanguage(_rawValue: en): 0.8619569540023804]
+```swift
+[__C.NLLanguage(_rawValue: de): 0.13059720396995544, __C.NLLanguage(_rawValue: en): 0.8619569540023804]
+```
 
 ### 초기화
 
