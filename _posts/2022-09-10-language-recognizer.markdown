@@ -83,4 +83,4 @@ recognizer.reset()
 
 ## 참고
 
-[Apple Developer Documentation](https://developer.apple.com/documentation/naturallanguage/identifying_the_language_in_text)
+[Identifying the language in text](https://developer.apple.com/documentation/naturallanguage/identifying_the_language_in_text)
