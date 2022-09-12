@@ -5,8 +5,6 @@ date: 2022-09-10 23:14:10 +0900
 tags: Swift NaturalLanguage
 ---
 
-## 언어 인식
-
 `NaturalLanguage` 프레임워크를 통해 언어를 인식할 수 있다.
 
 다음 코드는 가장 가능성이 높은 언어 식별자 하나를 알 수 있다.

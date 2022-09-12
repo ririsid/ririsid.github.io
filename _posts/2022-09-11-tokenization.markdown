@@ -5,8 +5,6 @@ date: 2022-09-11 15:19:46 +0900
 tags: Swift NaturalLanguage
 ---
 
-## 토큰화
-
 자연어 처리를 위해서는 문장을 의미있는 단위로 쪼개서 분석해야 한다. 이것을 토큰화(Tokenization)라고 한다.
 
 `NaturalLanguage` 프레임워크를 사용하면 토큰화를 할 수 있다.
