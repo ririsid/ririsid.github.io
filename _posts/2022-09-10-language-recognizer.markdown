@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "언어 인식"
+title: 언어 인식
 date: 2022-09-10 23:14:10 +0900
-tags: swift nlp
+tags: Swift NaturalLanguage
 ---
 
 ## 언어 인식
@@ -89,4 +89,4 @@ recognizer.reset()
 
 ## 참고
 
-[Identifying the language in text](https://developer.apple.com/documentation/naturallanguage/identifying_the_language_in_text)
+- [Identifying the language in text](https://developer.apple.com/documentation/naturallanguage/identifying_the_language_in_text)

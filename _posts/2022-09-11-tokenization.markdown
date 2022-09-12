@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "토큰화"
+title: 토큰화
 date: 2022-09-11 15:19:46 +0900
-tags: swift nlp
+tags: Swift NaturalLanguage
 ---
 
 ## 토큰화
@@ -220,6 +220,5 @@ let text = "あなたのデバイスとつながる。魔法のように。"
 
 ## 참고
 
-[Tokenizing natural language text](https://developer.apple.com/documentation/naturallanguage/tokenizing_natural_language_text)
-
-[Identifying parts of speech](https://developer.apple.com/documentation/naturallanguage/identifying_parts_of_speech)
+- [Tokenizing natural language text](https://developer.apple.com/documentation/naturallanguage/tokenizing_natural_language_text)
+- [Identifying parts of speech](https://developer.apple.com/documentation/naturallanguage/identifying_parts_of_speech)
