@@ -83,7 +83,7 @@ ssh -T git@github.com
 여기서는 임의로 _work_id_ed25519라 하겠다._
 
 ```Bash
-ssh-keygen -t ed25519 -C "your_company_email@company.com" -f "work_id_ed25519"
+ssh-keygen -t ed25519 -C "your_company_email@example.com" -f "work_id_ed25519"
 ```
 
 `~/.ssh/config` 파일을 수정한다.
@@ -94,7 +94,7 @@ Host github.com
   UseKeychain yes
   IdentityFile ~/.ssh/id_ed25519
 
-Host company.com
+Host example.com
   HostName github.com
   User git
   AddKeysToAgent yes
@@ -102,9 +102,9 @@ Host company.com
   IdentityFile ~/.ssh/work_id_ed25519
 ```
 
-회사용 설정을 추가했는데 `Host`가 *company.com*이고, `HostName`과 `User`도 추가됐다.
+회사용 설정을 추가했는데 `Host`가 *example.com*이고, `HostName`과 `User`도 추가됐다.
 
-`Host`의 *company.com*은 구분을 위한 임의의 값으로 실제 사용하는 호스트일 필요는 없다. *github.com*만 아니면 된다. 내 경우 회사 도메인을 사용했다.
+`Host`의 *example.com*은 구분을 위한 임의의 값으로 실제 사용하는 호스트일 필요는 없다. *github.com*만 아니면 된다. 내 경우 회사 도메인을 사용했다.
 
 `HostName`과 `User`는 SSH 연결을 확인할 때 설명하도록 하겠다.
 
@@ -122,13 +122,13 @@ ssh-add --apple-use-keychain ~/.ssh/work_id_ed25519
 
 [Testing your SSH connection - GitHub Docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection)
 
-중요한 건 호스트가 *company.com*이라는 것이다.
+중요한 건 호스트가 *example.com*이라는 것이다.
 
 ```other
-ssh -T git@company.com
+ssh -T git@example.com
 ```
 
-**이렇게 SSH 연결을 요청하면 실제로는 _config_ 파일에서 `Host`가 *company.com*인 설정에 따라 *git@github.com*으로 _work_id_ed25519_ 키를 사용해서 연결하게 된다.**
+**이렇게 SSH 연결을 요청하면 실제로는 _config_ 파일에서 `Host`가 *example.com*인 설정에 따라 *git@github.com*으로 _work_id_ed25519_ 키를 사용해서 연결하게 된다.**
 
 다음과 같은 메시지가 나오면 성공이다.
 
@@ -138,10 +138,10 @@ ssh -T git@company.com
 
 마지막으로 회사 저장소의 원격지(remote) 주소를 바꾸어주어야 한다.
 
-앞서와 마찬가지로 호스트를 *github.com*에서 *company.com*으로 바꾸자.
+앞서와 마찬가지로 호스트를 *github.com*에서 *example.com*으로 바꾸자.
 
 ```Bash
-git remote set-url origin git@company.com:YourCompany/repository.git
+git remote set-url origin git@example.com:YourCompany/repository.git
 ```
 
 이제 `git fetch`를 해서 오류가 발생하지 않으면 모든 과정이 끝난 것이다.
