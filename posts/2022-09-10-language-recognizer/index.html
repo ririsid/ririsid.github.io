@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta property="og:site_name" content="Optional Unwrapping"/><link rel="canonical" href="https://ririsid.github.io/posts/2022-09-10-language-recognizer"/><meta name="twitter:url" content="https://ririsid.github.io/posts/2022-09-10-language-recognizer"/><meta property="og:url" content="https://ririsid.github.io/posts/2022-09-10-language-recognizer"/><title>iOS 자연어 처리 - 언어 식별 | Optional Unwrapping</title><meta name="twitter:title" content="iOS 자연어 처리 - 언어 식별 | Optional Unwrapping"/><meta property="og:title" content="iOS 자연어 처리 - 언어 식별 | Optional Unwrapping"/><meta name="description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:description" content="암묵지 꺼내기 #Swift #iOS"/><meta property="og:description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Optional Unwrapping"/></head><body class="item-page"><header><div class="wrapper"><a href="/" class="site-name">Optional Unwrapping</a></div></header><div class="wrapper"><article><p>2022년 9월 10일</p><div class="content"><h1>iOS 자연어 처리 - 언어 식별</h1><p><code>NaturalLanguage</code> 프레임워크를 통해 언어를 식별할 수 있다.</p><p>다음 코드는 가장 가능성이 높은 언어 식별자 하나를 알 수 있다.</p><pre><code><span class="keyword">import</span> NaturalLanguage
+
+<span class="comment">// Create a language recognizer.</span>
+<span class="keyword">let</span> recognizer = <span class="type">NLLanguageRecognizer</span>()
+recognizer.<span class="call">processString</span>(<span class="string">"This is a test, mein Freund."</span>)
+
+<span class="comment">// Identify the dominant language.</span>
+<span class="keyword">if let</span> language = recognizer.<span class="property">dominantLanguage</span> {
+    <span class="call">print</span>(language.<span class="property">rawValue</span>)
+} <span class="keyword">else</span> {
+    <span class="call">print</span>(<span class="string">"Language not recognized"</span>)
+}
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>en
+</code></pre><h3>가능한 언어 목록</h3><p>가능한 언어를 더 많이 알 수도 있다. 다음은 최대 2개의 언어 식별자와 확률을 알 수 있다.</p><pre><code><span class="comment">// Generate up to two language hypotheses.</span>
+<span class="keyword">let</span> hypotheses = recognizer.<span class="call">languageHypotheses</span>(withMaximum: <span class="number">2</span>)
+<span class="call">print</span>(hypotheses)
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>[<span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: en): <span class="number">0.7789781093597412</span>, <span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: de): <span class="number">0.13277797400951385</span>]
+</code></pre><h3>제약 추가</h3><p>제약을 만들 수도 있다. 언어 목록을 제한할 수도 있고, 언어별 확률을 추가할 수도 있다.</p><pre><code><span class="comment">// Specify constraints for language identification.</span>
+recognizer.<span class="property">languageConstraints</span> = [.<span class="dotAccess">french</span>, .<span class="dotAccess">english</span>, .<span class="dotAccess">german</span>,
+                                  .<span class="dotAccess">italian</span>, .<span class="dotAccess">spanish</span>, .<span class="dotAccess">portuguese</span>]
+
+recognizer.<span class="property">languageHints</span> = [.<span class="dotAccess">french</span>: <span class="number">0.5</span>,
+                            .<span class="dotAccess">english</span>: <span class="number">0.9</span>,
+                            .<span class="dotAccess">german</span>: <span class="number">0.8</span>,
+                            .<span class="dotAccess">italian</span>: <span class="number">0.6</span>,
+                            .<span class="dotAccess">spanish</span>: <span class="number">0.3</span>,
+                            .<span class="dotAccess">portuguese</span>: <span class="number">0.2</span>]
+
+<span class="keyword">let</span> constrainedHypotheses = recognizer.<span class="call">languageHypotheses</span>(withMaximum: <span class="number">2</span>)
+<span class="call">print</span>(constrainedHypotheses)
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>[<span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: de): <span class="number">0.13059720396995544</span>, <span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: en): <span class="number">0.8619569540023804</span>]
+</code></pre><h3>초기화</h3><p>다른 문자열을 처리하기 전에는 초기화해야 한다.</p><pre><code><span class="comment">// Reset the recognizer to its initial state.</span>
+recognizer.<span class="call">reset</span>()
+</code></pre><hr><h2>참고</h2><ul><li><a href="https://developer.apple.com/documentation/naturallanguage/identifying_the_language_in_text">Identifying the language in text</a></li></ul></div><ul class="tag-list"><li><a href="/tags/ios">iOS</a></li><li><a href="/tags/naturallanguage">NaturalLanguage</a></li></ul></article></div><footer><p>Generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>

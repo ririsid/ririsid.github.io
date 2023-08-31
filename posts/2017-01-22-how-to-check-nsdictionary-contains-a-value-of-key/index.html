@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta property="og:site_name" content="Optional Unwrapping"/><link rel="canonical" href="https://ririsid.github.io/posts/2017-01-22-how-to-check-nsdictionary-contains-a-value-of-key"/><meta name="twitter:url" content="https://ririsid.github.io/posts/2017-01-22-how-to-check-nsdictionary-contains-a-value-of-key"/><meta property="og:url" content="https://ririsid.github.io/posts/2017-01-22-how-to-check-nsdictionary-contains-a-value-of-key"/><title>NSDictionary의 키에 값이 있는지 확인하기 | Optional Unwrapping</title><meta name="twitter:title" content="NSDictionary의 키에 값이 있는지 확인하기 | Optional Unwrapping"/><meta property="og:title" content="NSDictionary의 키에 값이 있는지 확인하기 | Optional Unwrapping"/><meta name="description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:description" content="암묵지 꺼내기 #Swift #iOS"/><meta property="og:description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Optional Unwrapping"/></head><body class="item-page"><header><div class="wrapper"><a href="/" class="site-name">Optional Unwrapping</a></div></header><div class="wrapper"><article><p>2017년 1월 22일</p><div class="content"><h1><code>NSDictionary</code>의 키에 값이 있는지 확인하기</h1><p>Objective-C에서 <code>NSDictionary</code>의 특정 키에 해당하는 값이 있는지 확인해야 할 때가 있다. 주로 서버에서 가져온 JSON 데이터에서 값을 추출할 때 필요하다.</p><p>전통적인 권장 방법은 <code>objectForKey</code> 메서드를 사용하는 것이다.</p><pre><code><span class="type">NSDictionary</span>&lt;<span class="type">NSString</span> *, <span class="type">NSString</span> *&gt; *married = <span class="keyword">@</span>{<span class="string">@"Sam" : @YES,
+                                                  @"John" : @YES,
+                                                  @"Kevin" : @YES,
+                                                  @"William" : @NO};</span>
+<span class="type">NSString</span> *key = <span class="string">@"John";</span>
+<span class="keyword">if</span> ([married objectForKey:key]) {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+} <span class="keyword">else</span> {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is not a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+}
+</code></pre><p>이 방법을 사용하면 크래시 없이 키에 값이 있는지 확인할 수 있다.</p><p>현대적인 Objective-C에서는 서브크립팅(<code>[]</code>) 문법으로 조금 더 편하게 사용할 수 있다.</p><pre><code><span class="comment">// 중복 코드 생략</span>
+<span class="keyword">if</span> (married[key]) {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+} <span class="keyword">else</span> {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is not a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+}
+</code></pre><p>첫 예제와 같은 동작을 하는 코드로 문법만 다르기 때문에 마찬가지로 크래시 없이 사용할 수 있다.</p><h2>JSON 데이터와 NSNull</h2><p>다만, JSON 데이터를 받을 때 의도와 다른 경우가 발생할 수 있다.</p><p><code>NSDictionary</code>는 <code>nil</code>을 값으로 가질 수 없기 때문에 키는 있고 값이 없는 경우, <code>[NSNull null]</code>이 값으로 할당되고는 한다. <strong>Objective-C에서 모든 객체는 조건문에서 <code>true</code>로 평가</strong> 되기 때문에 <code>[NSNull null]</code> 역시 <code>true</code>로 평가된다. <code>@0</code> 혹은 <code>@NO</code> 역시 마찬가지이다. 따라서 값이 <code>[NSNull null]</code>인 키는 조건문에서 값이 있다고 평가된다. 하지만 일반적으로는 값이 없다고 평가되어야 올바른 로직을 구현할 수 있다. 그래서 보통 다음과 같은 매크로를 사용한다.</p><pre><code>#define <span class="call">isNull</span>(value) value == <span class="keyword">nil</span> || [value isKindOfClass:[<span class="type">NSNull</span> <span class="keyword">class</span>]]
+
+<span class="type">NSDictionary</span>&lt;NSString *, <span class="type">NSString</span> *&gt; *married = <span class="keyword">@</span>{<span class="string">@"Sam" : @YES,
+                                                  @"John" : [NSNull null],
+                                                  @"Kevin" : @YES,
+                                                  @"William" : @NO};</span>
+<span class="type">NSString</span> *key = <span class="string">@"John";</span>
+<span class="keyword">if</span> (<span class="call">isNull</span>(married[key])) {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+} <span class="keyword">else</span> {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is not a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+}
+</code></pre><h2>Swift</h2><p>Swift에서는 어떻게 할까? Swift의 <code>Dictionary</code> 타입은 <code>nil</code>을 값으로 가질 수 있으므로 다음과 같은 코드를 만들었다.</p><pre><code><span class="keyword">let</span> married = [<span class="string">"Sam"</span>: <span class="keyword">true</span>,
+               <span class="string">"John"</span>: <span class="keyword">nil</span>,
+               <span class="string">"Kevin"</span>: <span class="keyword">true</span>,
+               <span class="string">"William"</span>: <span class="keyword">false</span>]
+<span class="keyword">let</span> key = <span class="string">"John"</span>
+<span class="keyword">if</span> married[key] != <span class="keyword">nil</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is a member."</span>)
+} <span class="keyword">else</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is not a member."</span>)
+}
+</code></pre><p>결과는 예상과 달리 <em>John is a member.</em> 다. 문제가 뭘까? <code>married</code>의 타입을 확인하면 <code>[String : Bool?]</code>이다. 값이 옵셔널 <code>Bool</code>이기 때문에 문제가 생겼다. 옵셔널을 언랩해야만 원하는 결과를 얻을 수 있다.</p><pre><code><span class="comment">// 중복 코드 생략</span>
+<span class="keyword">if let</span> value = married[key], value != <span class="keyword">nil</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is a member."</span>)
+} <span class="keyword">else</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is not a member."</span>)
+}
+</code></pre><p>이제 결과는 <em>John is not a member.</em>가 되었다.</p><h3>참고</h3><ul><li><a href="http://stackoverflow.com/questions/2784648/how-to-check-if-an-nsdictionary-or-nsmutabledictionary-contains-a-key">objective c - How to check if an NSDictionary or NSMutableDictionary contains a key? - Stack Overflow</a></li></ul></div><ul class="tag-list"><li><a href="/tags/objectivec">ObjectiveC</a></li><li><a href="/tags/swift">Swift</a></li></ul></article></div><footer><p>Generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>

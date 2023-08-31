@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta property="og:site_name" content="Optional Unwrapping"/><link rel="canonical" href="https://ririsid.github.io/posts/2015-07-26-the-swift-programming-language-swift-2-prerelease-error-handling-digest"/><meta name="twitter:url" content="https://ririsid.github.io/posts/2015-07-26-the-swift-programming-language-swift-2-prerelease-error-handling-digest"/><meta property="og:url" content="https://ririsid.github.io/posts/2015-07-26-the-swift-programming-language-swift-2-prerelease-error-handling-digest"/><title>Swift 프로그래밍 언어 - 오류 처리 | Optional Unwrapping</title><meta name="twitter:title" content="Swift 프로그래밍 언어 - 오류 처리 | Optional Unwrapping"/><meta property="og:title" content="Swift 프로그래밍 언어 - 오류 처리 | Optional Unwrapping"/><meta name="description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:description" content="암묵지 꺼내기 #Swift #iOS"/><meta property="og:description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Optional Unwrapping"/></head><body class="item-page"><header><div class="wrapper"><a href="/" class="site-name">Optional Unwrapping</a></div></header><div class="wrapper"><article><p>2015년 7월 26일</p><div class="content"><h1>Swift 스터디 5주차 (2015-08-01)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>오류 처리(Error Handling)</h2><ul><li>Swift는 런타임에 회복 가능한 오류(recoverable errors)를 던지고(throwing), 받고(catching), 전파하고(propagating), 조작하도록(manipulating) 돕는 퍼스트 클래스를 제공한다.</li><li>어떤 함수와 메서드는 항상 실행이 완료되거나 유용한 결과를 내놓는다고 보장하지 않는다.</li><li>옵셔널은 값이 없을 수 있음을 표현한다. 하지만 때로는 함수가 실패했을 때, 어떻게 실패했는지 알고 거기에 대응하는 게 더 유용하다.</li><li>예를 들어 파일을 읽고 처리한다고 하자. 이 작업이 실패하는 경우는 여러가지이다. 지정한 위치(path)에 파일이 없거나, 읽기 권한이 없거나, 적절한 포멧으로 인코딩되지 않았거나. 이러한 구분은 프로그램이 오류를 해결하고, 회복하고, 필요하면 사용자에게 알리는 것을 가능하게 한다.</li></ul><blockquote><p>Swift의 오류 처리 패턴은 Cocoa와 Objective-C의 <code>NSError</code>와 함께 쓸 수 있다.</p></blockquote><h3>오류 표현</h3><ul><li>Swift에서 오류는 <code>ErrorType</code> 프로토콜을 따르는 타입의 값으로 표현된다.</li><li><code>enum</code>은 오류에 대한 추가정보를 가진 관련 값을 포함한 관계된 오류 상태 그룹을 모델링하는데 적합하다.</li><li>이는 <code>enum</code>이 <code>ErrorType</code>을 채용하면, 컴파일러에 의해 합성된 구현을 자동으로 가지기 때문이다.</li><li>다음은 자판기의 오류 상태의 표현의 예제다.</li></ul><pre><code><span class="keyword">enum</span> VendingMachineError: <span class="type">ErrorType</span> {
+    <span class="keyword">case</span> <span class="type">InvalidSelection</span>
+    <span class="keyword">case</span> <span class="type">InsufficientFunds</span>(required: <span class="type">Double</span>)
+    <span class="keyword">case</span> <span class="type">OutOfStock</span>
+}
+</code></pre><h3>오류 던지기(Throwing Errors)</h3><ul><li>함수나 메서드의 정의에서 파라미터 다음에 <code>throws</code> 키워드를 써서 그 함수나 메서드가 오류를 던질 수 있다는 것을 표시한다.</li><li>반환 타입이 있으면 <code>throws</code> 키워드를 반환 화살표(<code>-&gt;</code>) 전에 적어야 한다.</li><li>함수, 메서드, 클로저는 명시적으로 표시하지 않으면 오류를 던질 수 없다.</li></ul><pre><code><span class="keyword">func</span> canThrowErrors() <span class="keyword">throws</span> -&gt; <span class="type">String</span>
+
+<span class="keyword">func</span> cannotThrowErrors() -&gt; <span class="type">String</span>
+</code></pre><ul><li>던지는 함수(throwing function)의 본문 어디서나 <code>throw</code> 구문을 써서 오류를 던질 수 있다.</li></ul><pre><code><span class="keyword">struct</span> Item {
+    <span class="keyword">var</span> price: <span class="type">Double</span>
+    <span class="keyword">var</span> count: <span class="type">Int</span>
+}
+
+<span class="keyword">var</span> inventory = [
+    <span class="string">"Candy Bar"</span>: <span class="type">Item</span>(price: <span class="number">1.25</span>, count: <span class="number">7</span>),
+    <span class="string">"Chips"</span>: <span class="type">Item</span>(price: <span class="number">1.00</span>, count: <span class="number">4</span>),
+    <span class="string">"Pretzels"</span>: <span class="type">Item</span>(price: <span class="number">0.75</span>, count: <span class="number">11</span>)
+]
+<span class="keyword">var</span> amountDeposited = <span class="number">1.00</span>
+
+<span class="keyword">func</span> vend(itemNamed name: <span class="type">String</span>) <span class="keyword">throws</span> {
+    <span class="keyword">guard var</span> item = inventory[name] <span class="keyword">else</span> {
+        <span class="keyword">throw</span> <span class="type">VendingMachineError</span>.<span class="type">InvalidSelection</span>
+    }
+
+    <span class="keyword">guard</span> item.<span class="property">count</span> &gt; <span class="number">0</span> <span class="keyword">else</span> {
+        <span class="keyword">throw</span> <span class="type">VendingMachineError</span>.<span class="type">OutOfStock</span>
+    }
+
+    <span class="keyword">if</span> amountDeposited &gt;= item.<span class="property">price</span> {
+        <span class="comment">// Dispense the snack</span>
+        amountDeposited -= item.<span class="property">price</span>
+        --item.<span class="property">count</span>
+        inventory[name] = item
+    } <span class="keyword">else</span> {
+        <span class="keyword">let</span> amountRequired = item.<span class="property">price</span> - amountDeposited
+        <span class="keyword">throw</span> <span class="type">VendingMachineError</span>.<span class="type">InsufficientFunds</span>(required: amountRequired)
+    }
+}
+</code></pre><pre><code><span class="keyword">let</span> favoriteSnacks = [
+    <span class="string">"Alice"</span>: <span class="string">"Chips"</span>,
+    <span class="string">"Bob"</span>: <span class="string">"Licorice"</span>,
+    <span class="string">"Eve"</span>: <span class="string">"Pretzels"</span>,
+]
+<span class="keyword">func</span> buyFavoriteSnack(person: <span class="type">String</span>) <span class="keyword">throws</span> {
+    <span class="keyword">let</span> snackName = favoriteSnacks[person] ?? <span class="string">"Candy Bar"</span>
+    <span class="keyword">try</span> <span class="call">vend</span>(itemNamed: snackName)
+}
+</code></pre><h3>오류 받고 처리하기(Catching and Handling Errors)</h3><ul><li><code>do-catch</code> 문을 사용해서 오류를 받고 처리할 수 있다.</li></ul><pre><code><span class="keyword">do</span> {
+    <span class="keyword">try</span> function that <span class="keyword">throws</span>
+    statements
+} <span class="keyword">catch</span> pattern {
+    statements
+}
+</code></pre><ul><li>오류가 던져지면 오류는 <code>catch</code> 절을 만날 때까지 바깥 스코프로 전파된다.</li><li><code>switch</code> 문처럼 컴파일러는 <code>catch</code> 절이 완전한지 추론한다. 그렇게 판단하면 오류가 관리되고 있다고 간주한다.</li><li>그렇지 않으면 포함하고 있는 영역에서 오류를 처리해야 한다. 또는 포함하고 있는 함수가 <code>throws</code>와 함께 정의되어야 한다.</li><li>오류가 처리되는 것을 보장하기 위해 모든 오류에 대응하는 패턴으로 <code>catch</code> 절을 사용한다.</li><li>만약 <code>catch</code> 절이 패턴을 특징 짓지 않는다면, 모든 오류를 <code>error</code> 라는 이름의 지역 변수로 연결한다.</li></ul><pre><code><span class="keyword">do</span> {
+    <span class="keyword">try</span> <span class="call">vend</span>(itemNamed: <span class="string">"Candy Bar"</span>)
+    <span class="comment">// Enjoy delicious snack</span>
+} <span class="keyword">catch</span> <span class="type">VendingMachineError</span>.<span class="type">InvalidSelection</span> {
+    <span class="call">print</span>(<span class="string">"Invalid Selection."</span>)
+} <span class="keyword">catch</span> <span class="type">VendingMachineError</span>.<span class="type">OutOfStock</span> {
+    <span class="call">print</span>(<span class="string">"Out of Stock."</span>)
+} <span class="keyword">catch</span> <span class="type">VendingMachineError</span>.<span class="type">InsufficientFunds</span>(<span class="keyword">let</span> amountRequired) {
+    <span class="call">print</span>(<span class="string">"Insufficient funds. Please insert an additional $</span>\(amountRequired)<span class="string">."</span>)
+}
+</code></pre><ul><li>위 예제에서 <code>vend(itemNamed:)</code>는 오류를 던질 수 있기 때문에 <code>try</code> 표현식으로 호출된다.</li><li>오류가 던져지면 실행(execution)은 즉시 <code>catch</code> 절로 전달되고, 전파를 계속할 지 결정한다.</li><li>오류가 던져지지 않으면 <code>snack</code>에 <code>vend(itemNamed:)</code> 반환 값이 할당되고, <code>do</code> 문에 있는 남은 구문이 실행된다.</li></ul><h4>오류 전파(Propagation) 막기</h4><ul><li>어떤 경우는 던지기 함수나 메서드가 실행중에 오류를 던지지 않을 것을 알 수 있다. 이런 경우, <code>try!</code>를 쓰는 <em>강제 시도(forced-try)</em> 표현식을 통해 던지기 함수나 메서드를 호출할 수 있다.</li><li><code>try!</code>를 써서 던지기 함수나 메서드를 호출하면 오류 전파를 막고, 실행 중에 오류가 던져지지 않는다고 포장한다.</li><li>실제로 오류가 던져지면 런타임 오류가 발생한다.</li></ul><pre><code><span class="keyword">func</span> willOnlyThrowIfTrue(value: <span class="type">Bool</span>) <span class="keyword">throws</span> {
+    <span class="keyword">if</span> value { <span class="keyword">throw</span> someError }
+}
+
+<span class="keyword">do</span> {
+    <span class="keyword">try</span> <span class="call">willOnlyThrowIfTrue</span>(<span class="keyword">false</span>)
+} <span class="keyword">catch</span> {
+    <span class="comment">// Handle Error</span>
+}
+
+<span class="keyword">try</span>! <span class="call">willOnlyThrowIfTrue</span>(<span class="keyword">false</span>)
+</code></pre><h4>정리(Clean-Up) 행동 지정</h4><ul><li><code>defer</code> 문을 사용해 일부 구문을 실행(execution)이 현재 코드 블럭을 떠나기 직전에 실행하도록 할 수 있다.</li><li>이것을 이용해 오류가 발생하든 안하든 실행해야 하는 정리 작업을 할 수 있다.</li><li>예를 들면 열린 파일 서술자를 닫고, 직접 할당한 메모리를 해제하는 것이다.</li><li><code>defer</code> 문은 현재 스코프가 끝날 때까지 실행을 지연한다.</li><li>지연된 구문은 <code>break</code> 나 <code>return</code> 문 또는 오류를 던지는 것과 같이 문장 밖으로 제어를 넘기는 코드를 포함하지 않는다.</li><li>지연된 행동은 기술된 순서의 반대로 실행된다. 첫 번째 <code>defer</code> 문이 두 번째 <code>defer</code> 문 다음에 실행된다.</li></ul><pre><code><span class="keyword">func</span> processFile(filename: <span class="type">String</span>) <span class="keyword">throws</span> {
+    <span class="keyword">if</span> <span class="call">exists</span>(filename) {
+        <span class="keyword">let</span> file = <span class="call">open</span>(filename)
+        <span class="keyword">defer</span> {
+            <span class="call">close</span>(file)
+        }
+        <span class="keyword">while let</span> line = <span class="keyword">try</span> file.<span class="call">readline</span>() {
+            <span class="comment">// Work with the file.</span>
+        }
+        <span class="comment">// close(file) is called here, at the end of the scope.</span>
+    }
+}
+</code></pre><ul><li>위 예제에서 <code>defer</code> 문을 써서 <code>open(_:)</code> 문이 대응하는 <code>close(_:)</code> 문이 호출되는 것을 보장한다.</li><li>이 호출은 오류가 던져지든 않든 상관 없다.</li></ul></div><ul class="tag-list"><li><a href="/tags/swift">Swift</a></li></ul></article></div><footer><p>Generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>

@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Optional Unwrapping</title><description>암묵지 꺼내기. 개발하며 배운 것들. #Swift #iOS</description><link>https://ririsid.github.io</link><language>ko</language><lastBuildDate>Thu, 31 Aug 2023 14:54:23 +0900</lastBuildDate><pubDate>Thu, 31 Aug 2023 14:54:23 +0900</pubDate><ttl>250</ttl><atom:link href="https://ririsid.github.io/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://ririsid.github.io/posts/2022-09-14-urls-in-xcconfig</guid><title>.xcconfig 파일에서 URL 사용하기</title><description></description><link>https://ririsid.github.io/posts/2022-09-14-urls-in-xcconfig</link><pubDate>Wed, 14 Sep 2022 22:45:41 +0900</pubDate><content:encoded><![CDATA[<h1>.xcconfig 파일에서 URL 사용하기</h1><p><em>.xcconfig</em> 파일 안에서 <code>//</code>는 문맥과 상관 없이 주석으로 처리된다.</p><p>따라서 <code>https://example.com</code> 같은 URL은 <code>//example.com</code>이 주석으로 처리되어 설정에서 URL을 가져오면 <code>https:</code>만 가져오게 된다.</p><h2>해결 방법 1</h2><pre><code><span class="type">URL</span> = https:/$()/example.<span class="property">com</span>
+</code></pre><p>주석은 슬래시(/)가 연속으로 붙어있어야 하므로 빈 값(<code>$()</code>)을 중간에 끼어 넣으면 빌드 설정을 평가할 때 빈 값이 제거되면서 원하는 값을 얻을 수 있게 된다.</p><h2>해결 방법 2</h2><pre><code><span class="type">URL</span> = example.<span class="property">com</span>
+</code></pre><p><code>https://</code>를 <em>xcconfig</em> 파일에서 사용하지 않는다. 대신 <code>.plist</code> 파일에서 참조할 때 붙인다.</p><pre><code>https://${<span class="type">URL</span>}
+</code></pre><p>다만 이렇게 하면 개발 환경에 따라 프로토콜(http|https)이 나뉘는 경우 처리가 어렵다.</p><hr><h2>참고</h2><ul><li><a href="https://stackoverflow.com/a/36297483/15639964">How do I configure full URLs in xcconfig files</a></li><li><a href="https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project">Adding a Build Configuration File to Your Project</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2022-09-13-multiple-github-accounts-on-macos</guid><title>macOS 다중 GitHub 계정 사용</title><description></description><link>https://ririsid.github.io/posts/2022-09-13-multiple-github-accounts-on-macos</link><pubDate>Tue, 13 Sep 2022 22:10:07 +0900</pubDate><content:encoded><![CDATA[<h1>macOS 다중 GitHub 계정 사용</h1><p>나는 두 개의 GitHub 계정을 사용한다. 개인 계정과 회사 계정이다.</p><p>처음에는 ssh-agent 등록을 통해 구분하려고 했다. 그런데 이게 귀찮고 햇갈리는 일이다.</p><p>다른 방법을 찾아보니 SSH <em>config</em> 파일을 이용해 구분하는 방법이 있었다.</p><p>여기서는 개인 계정을 기본 계정으로 사용하고, 회사 계정으로 일부 저장소를 사용한다고 가정하겠다.</p><p>여기서 모든 SSH 키 사용에 관한 모든 내용을 다루지 않으므로 SSH 키 사용 경험이 없거나 무언가 문제가 생긴다면 다음 GitHub의 문서를 참고하며 진행하자.</p><p><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent">Generating a new SSH key and adding it to the ssh-agent - GitHub Docs</a></p><h3>기본(개인) SSH 키 등록</h3><p>우선 기본 SSH 키를 생성한다.</p><pre><code>ssh-keygen -t ed25519 -<span class="type">C</span> <span class="string">"your_email@example.com"</span>
+</code></pre><p>기본 설정을 따르면 <em>id</em>ed25519*라는 키가 만들어졌을 것이다.</p><p>다음은 ssh-agent를 백그라운드로 실행한다.</p><pre><code>eval <span class="string">"$(ssh-agent -s)"</span>
+</code></pre><p><code>~/.ssh/config</code> 파일을 수정(혹은 생성)한다.</p><pre><code><span class="type">Host</span> *
+  <span class="type">AddKeysToAgent</span> yes
+  <span class="type">UseKeychain</span> yes
+  <span class="type">IdentityFile</span> ~/.<span class="property">ssh</span>/id_ed25519
+</code></pre><p><strong>GitHub 문서에서는 위와 같이 되어 있지만 이렇게 하면 모든 호스트(<code>Host *</code>)가 기본 SSH 키를 사용하게 되므로 이후 추가할 회사용 SSH 키를 구분할 수 없게 된다.</strong></p><p>따라서 <code>~/.ssh/config</code> 파일을 다음과 같이 수정한다.</p><pre><code><span class="type">Host</span> github.<span class="property">com</span>
+  <span class="type">AddKeysToAgent</span> yes
+  <span class="type">UseKeychain</span> yes
+  <span class="type">IdentityFile</span> ~/.<span class="property">ssh</span>/id_ed25519
+</code></pre><p><code>Host</code>를 *에서 <em>github.com</em>으로 바꾸었다.</p><p>GitHub의 저장소는 호스트가 <em>github.com</em>이므로 이렇게 설정하면 모든 GitHub 저장소에 기본 SSH 키가 적용된다.</p><p>ssh-agent에 기본 SSH 키를 추가한다.</p><pre><code>ssh-add --apple-use-keychain ~/.<span class="property">ssh</span>/id_ed25519
+</code></pre><p>다음 문서를 참고해 개인 GitHub 계정에 SSH 키를 추가한다.</p><p><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account - GitHub Docs</a></p><p>SSH 연결을 확인한다. [<a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection">참고</a>]</p><pre><code>ssh -<span class="type">T</span> git@github.<span class="property">com</span>
+</code></pre><p>다음과 같은 메시지가 나오면 성공이다.</p><blockquote><p>Hi <em>username</em>! You've successfully authenticated, but GitHub does not provide shell access.</p></blockquote><h3>회사용 SSH 키 등록</h3><p>회사용 SSH 키를 생성한다. 여기서는 임의로 <em>work</em>id<em>ed25519라 하겠다.</em></p><pre><code>ssh-keygen -t ed25519 -<span class="type">C</span> <span class="string">"your_company_email@example.com"</span> -f <span class="string">"work_id_ed25519"</span>
+</code></pre><p><code>~/.ssh/config</code> 파일을 수정한다.</p><pre><code><span class="type">Host</span> github.<span class="property">com</span>
+  <span class="type">AddKeysToAgent</span> yes
+  <span class="type">UseKeychain</span> yes
+  <span class="type">IdentityFile</span> ~/.<span class="property">ssh</span>/id_ed25519
+
+<span class="type">Host</span> example.<span class="property">com</span>
+  <span class="type">HostName</span> github.<span class="property">com</span>
+  <span class="type">User</span> git
+  <span class="type">AddKeysToAgent</span> yes
+  <span class="type">UseKeychain</span> yes
+  <span class="type">IdentityFile</span> ~/.<span class="property">ssh</span>/work_id_ed25519
+</code></pre><p>회사용 설정을 추가했는데 <code>Host</code>가 <em>example.com</em>이고, <code>HostName</code>과 <code>User</code>도 추가됐다.</p><p><code>Host</code>의 <em>example.com</em>은 구분을 위한 임의의 값으로 실제 사용하는 호스트일 필요는 없다. <em>github.com</em>만 아니면 된다. 내 경우 회사 도메인을 사용했다.</p><p><code>HostName</code>과 <code>User</code>는 SSH 연결을 확인할 때 설명하도록 하겠다.</p><p>ssh-agent에 회사용 SSH 키를 추가한다.</p><pre><code>ssh-add --apple-use-keychain ~/.<span class="property">ssh</span>/work_id_ed25519
+</code></pre><p>개인 GitHub 계정에 그랬던 것처럼 회사 GitHub 계정에도 SSH 키를 추가한다.</p><p><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account - GitHub Docs</a></p><p>이제 SSH 연결을 확인한다.</p><p><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection">Testing your SSH connection - GitHub Docs</a></p><p>중요한 건 호스트가 <em>example.com</em>이라는 것이다.</p><pre><code>ssh -<span class="type">T</span> git@example.<span class="property">com</span>
+</code></pre><p><strong>이렇게 SSH 연결을 요청하면 실제로는 <em>config</em> 파일에서 <code>Host</code>가 <em>example.com</em>인 설정에 따라 <em>git@github.com</em>으로 <em>work</em>id<em>ed25519</em> 키를 사용해서 연결하게 된다.</strong></p><p>다음과 같은 메시지가 나오면 성공이다.</p><blockquote><p>Hi <em>company</em>username_! You've successfully authenticated, but GitHub does not provide shell access.</p></blockquote><h3>회사 저장소 주소 바꾸기</h3><p>마지막으로 회사 저장소의 원격지(remote) 주소를 바꾸어주어야 한다.</p><p>앞서와 마찬가지로 호스트를 <em>github.com</em>에서 <em>example.com</em>으로 바꾸자.</p><pre><code>git remote <span class="keyword">set</span>-url origin git@example.<span class="property">com</span>:<span class="type">YourCompany</span>/repository.<span class="property">git</span>
+</code></pre><p>이제 <code>git fetch</code>를 해서 오류가 발생하지 않으면 모든 과정이 끝난 것이다.</p><h3>정리</h3><p>SSH는 <em>config</em> 파일의 <code>Host</code> 설정에 따라 적용할 SSH 키를 지정할 수 있고, 임의의 호스트도 설정에 따라 원래의 호스트로 연결할 수 있다.</p><p>이를 이용하면 몇 개의 계정을 사용하든 임의의 호스트를 설정해 호스트에 따라 원하는 SSH 키로 GitHub에 연결할 수 있다.</p><hr><h2>참고</h2><ul><li><a href="https://www.freecodecamp.org/news/manage-multiple-github-accounts-the-ssh-way-2dadc30ccaca/">How to manage multiple GitHub accounts on a single machine with SSH keys</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2022-09-12-dynamic-island-sdk</guid><title>Dynamic Island 개발을 위한 SDK</title><description></description><link>https://ririsid.github.io/posts/2022-09-12-dynamic-island-sdk</link><pubDate>Mon, 12 Sep 2022 10:37:47 +0900</pubDate><content:encoded><![CDATA[<h1>Dynamic Island 개발을 위한 SDK</h1><p>이번 Apple Event에서 Dynamic Island가 공개되었다.</p><p>개발자다 보니 'WWDC에서 못 본 것 같은데?'라는 생각이 먼저 들었다.</p><p>검색해보니 iOS 16 beta 4와 iOS 16 beta 5에서 사용 가능한 <code>ActivityKit</code> 프레임워크를 통해 구현할 수 있다고 한다. 또한 iOS 16 출시 버전에는 포함되지 않고, 이후 업데이트로 추가된다고 한다.</p><blockquote><p>안녕하세요. 실시간 현황(Live Activities)과 Dynamic Island에 관심을 가져주셔서 감사합니다! 실시간 현황은 iOS 16 베타 4 및 iOS 16 베타 5에서 사용 가능한 ActivityKit 프레임워크를 사용하여 구현됩니다. ActivityKit 프레임워크는 iOS 16 RC에 포함되어 있지 않으며 Xcode 14 RC에도 포함되어 있지 않습니다. ActivityKit은 <a href="https://developer.apple.com/kr/news/?id=hi37aek8">이 뉴스 및 업데이트 게시물</a>에서 언급한 바와 같이 올해 후반에 출시될 iOS 16 업데이트에 포함될 예정입니다. iOS 16 업데이트에서 ActivityKit을 사용할 수 있게 되면 Dynamic Island에서 실시간 현황을 구현하고 상호 작용할 수 있습니다. 이 새로운 기능으로 무엇을 만드실지 매우 기대됩니다!</p></blockquote><p>출처: <a href="https://developer.apple.com/forums/thread/713978?answerId=726743022#726743022">Accessing Dynamic Island on iPhone 14</a></p><hr><h2>참고</h2><ul><li><a href="https://developer.apple.com/kr/news/?id=hi37aek8">이제 베타에서 실시간 현황(Live Activities)을 사용할 수 있습니다</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2022-09-11-tokenization</guid><title>iOS 자연어 처리 - 토큰화</title><description></description><link>https://ririsid.github.io/posts/2022-09-11-tokenization</link><pubDate>Sun, 11 Sep 2022 15:19:46 +0900</pubDate><content:encoded><![CDATA[<h1>iOS 자연어 처리 - 토큰화</h1><p>자연어 처리를 위해서는 문장을 의미있는 단위로 쪼개서 분석해야 한다. 이것을 토큰화(Tokenization)라고 한다.</p><p><code>NaturalLanguage</code> 프레임워크를 사용하면 토큰화를 할 수 있다.</p><pre><code><span class="keyword">let</span> text = <span class="string">"""
+iOS 16 enhances iPhone with all-new personalization features,
+deeper intelligence, and more seamless ways to communicate
+and share.
+"""</span>
+
+<span class="keyword">let</span> tokenizer = <span class="type">NLTokenizer</span>(unit: .<span class="dotAccess">word</span>)
+tokenizer.<span class="property">string</span> = text
+
+tokenizer.<span class="call">enumerateTokens</span>(in: text.<span class="property">startIndex</span>..&lt;text.<span class="property">endIndex</span>) { tokenRange, <span class="keyword">_ in</span>
+    <span class="call">print</span>(text[tokenRange])
+    <span class="keyword">return true</span>
+}
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>iOS
+<span class="number">16</span>
+enhances
+iPhone
+with
+all
+new
+personalization
+features
+deeper
+intelligence
+and
+more
+seamless
+ways
+to
+communicate
+and
+share
+</code></pre><h3>한국어</h3><p>영어를 사용할 때는 문제가 없지만 한국어를 사용하면 아쉬워진다. 영어는 단어(word)와 구두점(punctuation), 띄어쓰기(whitespace)로 나누어 토큰화가 가능하다.</p><p>한국어는 단어에 조사, 어미 등이 붙는 <strong>교착어</strong>로서 다른 형태소와 결합하여 사용되는 의존 형태소가 있어 <strong>형태소(morpheme)</strong>를 기반으로 토큰화 해야 자연어 처리가 쉬워진다.</p><p>위 코드에서 <code>text</code>를 한국어로 바꾸어 보았다.</p><pre><code><span class="keyword">let</span> text = <span class="string">"""
+iPhone의 능력을 한 단계 더 끌어올려주는 iOS 16. 완전히 새로운
+각종 사용자화 기능, 더 깊어진 지능 그리고 더욱더 매끄러운 소통 및
+공유 방식을 선사합니다.
+"""</span>
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>iPhone의
+능력을
+한
+단계
+더
+끌어올려주는
+iOS
+<span class="number">16</span>
+완전히
+새로운
+각종
+사용자화
+기능
+더
+깊어진
+지능
+그리고
+더욱더
+매끄러운
+소통
+및
+공유
+방식을
+선사합니다
+</code></pre><p>결합된 형태소가 분리되지 않는다.</p><p>"능력"이라는 명사를 찾지 못하고 "능력은", "능력을"을 다른 단어로 인식한다는 것이다.</p><p>"iPhone의"는 내가 잘못 본 줄 알았다.</p><h3>일본어</h3><p>일본어도 한국어와 같은 교착어지만 형태소가 결합하는 경우가 적어서 그런지 상대적으로 토큰화가 잘 되는 것으로 보인다.</p><p><code>text</code>를 일본어로 바꾸어 보았다.</p><pre><code><span class="keyword">let</span> text = <span class="string">"""
+iOS 16、登場。まったく新しいカスタマイズ機能、より賢い知能、
+コミュニケーションと共有を一段とシームレスにする方法が満載です。
+あなたのiPhoneに、さらなる進化を。
+"""</span>
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>iOS
+<span class="number">16</span>
+登場
+まったく
+新しい
+カスタマイズ
+機能
+より
+賢い
+知能
+コミュニケーション
+と
+共有
+を
+一段
+と
+シームレス
+に
+する
+方法
+が
+満載
+です
+あなた
+の
+iPhone
+に
+さらなる
+進化
+を
+</code></pre><p>물론 "まったく", "まったい" 같이 어미가 다른 말이 구분되지 않는 한국어와 같은 문제가 있다.</p><h3>품사 식별</h3><p>품사 식별을 해보면 더 쉽게 알 수 있다.</p><pre><code><span class="keyword">let</span> text = <span class="string">"A magical connection to your devices."</span>
+<span class="keyword">let</span> tagger = <span class="type">NLTagger</span>(tagSchemes: [.<span class="dotAccess">lexicalClass</span>])
+tagger.<span class="property">string</span> = text
+<span class="keyword">let</span> options: <span class="type">NLTagger</span>.<span class="type">Options</span> = [.<span class="dotAccess">omitPunctuation</span>, .<span class="dotAccess">omitWhitespace</span>]
+tagger.<span class="call">enumerateTags</span>(in: text.<span class="property">startIndex</span>..&lt;text.<span class="property">endIndex</span>, unit: .<span class="dotAccess">word</span>, scheme: .<span class="dotAccess">lexicalClass</span>, options: options) { tag, tokenRange <span class="keyword">in
+    if let</span> tag = tag {
+        <span class="call">print</span>(<span class="string">"</span>\(text[tokenRange])<span class="string">:</span> \(tag.<span class="property">rawValue</span>)<span class="string">"</span>)
+    }
+    <span class="keyword">return true</span>
+}
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code><span class="type">A</span>: <span class="type">Determiner</span>
+magical: <span class="type">Adjective</span>
+connection: <span class="type">Noun</span>
+to: <span class="type">Preposition</span>
+your: <span class="type">Determiner</span>
+devices: <span class="type">Noun</span>
+</code></pre><p>한국어로 <code>text</code>를 바꾼 결과는 다음과 같다.</p><pre><code><span class="keyword">let</span> text = <span class="string">"기기에 바로 연결되는 매혹적인 경험."</span>
+</code></pre><pre><code>기기에: <span class="type">OtherWord</span>
+바로: <span class="type">OtherWord</span>
+연결되는: <span class="type">OtherWord</span>
+매혹적인: <span class="type">OtherWord</span>
+경험: <span class="type">OtherWord</span>
+</code></pre><p>일본어로 <code>text</code>를 바꾼 결과는 다음과 같다.</p><pre><code><span class="keyword">let</span> text = <span class="string">"あなたのデバイスとつながる。魔法のように。"</span>
+</code></pre><pre><code>あなた: <span class="type">OtherWord</span>
+の: <span class="type">OtherWord</span>
+デバイス: <span class="type">OtherWord</span>
+と: <span class="type">OtherWord</span>
+つながる: <span class="type">OtherWord</span>
+魔法: <span class="type">OtherWord</span>
+の: <span class="type">OtherWord</span>
+よう: <span class="type">OtherWord</span>
+に: <span class="type">OtherWord</span>
+</code></pre><p>토큰화는 일본어가 한국어보다 조금 낫지만 품사 인식은 둘 다 안된다.</p><hr><h2>참고</h2><ul><li><a href="https://developer.apple.com/documentation/naturallanguage/tokenizing_natural_language_text">Tokenizing natural language text</a></li><li><a href="https://developer.apple.com/documentation/naturallanguage/identifying_parts_of_speech">Identifying parts of speech</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2022-09-10-language-recognizer</guid><title>iOS 자연어 처리 - 언어 식별</title><description></description><link>https://ririsid.github.io/posts/2022-09-10-language-recognizer</link><pubDate>Sat, 10 Sep 2022 23:14:10 +0900</pubDate><content:encoded><![CDATA[<h1>iOS 자연어 처리 - 언어 식별</h1><p><code>NaturalLanguage</code> 프레임워크를 통해 언어를 식별할 수 있다.</p><p>다음 코드는 가장 가능성이 높은 언어 식별자 하나를 알 수 있다.</p><pre><code><span class="keyword">import</span> NaturalLanguage
+
+<span class="comment">// Create a language recognizer.</span>
+<span class="keyword">let</span> recognizer = <span class="type">NLLanguageRecognizer</span>()
+recognizer.<span class="call">processString</span>(<span class="string">"This is a test, mein Freund."</span>)
+
+<span class="comment">// Identify the dominant language.</span>
+<span class="keyword">if let</span> language = recognizer.<span class="property">dominantLanguage</span> {
+    <span class="call">print</span>(language.<span class="property">rawValue</span>)
+} <span class="keyword">else</span> {
+    <span class="call">print</span>(<span class="string">"Language not recognized"</span>)
+}
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>en
+</code></pre><h3>가능한 언어 목록</h3><p>가능한 언어를 더 많이 알 수도 있다. 다음은 최대 2개의 언어 식별자와 확률을 알 수 있다.</p><pre><code><span class="comment">// Generate up to two language hypotheses.</span>
+<span class="keyword">let</span> hypotheses = recognizer.<span class="call">languageHypotheses</span>(withMaximum: <span class="number">2</span>)
+<span class="call">print</span>(hypotheses)
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>[<span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: en): <span class="number">0.7789781093597412</span>, <span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: de): <span class="number">0.13277797400951385</span>]
+</code></pre><h3>제약 추가</h3><p>제약을 만들 수도 있다. 언어 목록을 제한할 수도 있고, 언어별 확률을 추가할 수도 있다.</p><pre><code><span class="comment">// Specify constraints for language identification.</span>
+recognizer.<span class="property">languageConstraints</span> = [.<span class="dotAccess">french</span>, .<span class="dotAccess">english</span>, .<span class="dotAccess">german</span>,
+                                  .<span class="dotAccess">italian</span>, .<span class="dotAccess">spanish</span>, .<span class="dotAccess">portuguese</span>]
+
+recognizer.<span class="property">languageHints</span> = [.<span class="dotAccess">french</span>: <span class="number">0.5</span>,
+                            .<span class="dotAccess">english</span>: <span class="number">0.9</span>,
+                            .<span class="dotAccess">german</span>: <span class="number">0.8</span>,
+                            .<span class="dotAccess">italian</span>: <span class="number">0.6</span>,
+                            .<span class="dotAccess">spanish</span>: <span class="number">0.3</span>,
+                            .<span class="dotAccess">portuguese</span>: <span class="number">0.2</span>]
+
+<span class="keyword">let</span> constrainedHypotheses = recognizer.<span class="call">languageHypotheses</span>(withMaximum: <span class="number">2</span>)
+<span class="call">print</span>(constrainedHypotheses)
+</code></pre><p>출력 결과는 다음과 같다.</p><pre><code>[<span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: de): <span class="number">0.13059720396995544</span>, <span class="type">__C</span>.<span class="type">NLLanguage</span>(_rawValue: en): <span class="number">0.8619569540023804</span>]
+</code></pre><h3>초기화</h3><p>다른 문자열을 처리하기 전에는 초기화해야 한다.</p><pre><code><span class="comment">// Reset the recognizer to its initial state.</span>
+recognizer.<span class="call">reset</span>()
+</code></pre><hr><h2>참고</h2><ul><li><a href="https://developer.apple.com/documentation/naturallanguage/identifying_the_language_in_text">Identifying the language in text</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2017-01-22-how-to-check-nsdictionary-contains-a-value-of-key</guid><title>NSDictionary의 키에 값이 있는지 확인하기</title><description></description><link>https://ririsid.github.io/posts/2017-01-22-how-to-check-nsdictionary-contains-a-value-of-key</link><pubDate>Sun, 22 Jan 2017 16:25:00 +0900</pubDate><content:encoded><![CDATA[<h1><code>NSDictionary</code>의 키에 값이 있는지 확인하기</h1><p>Objective-C에서 <code>NSDictionary</code>의 특정 키에 해당하는 값이 있는지 확인해야 할 때가 있다. 주로 서버에서 가져온 JSON 데이터에서 값을 추출할 때 필요하다.</p><p>전통적인 권장 방법은 <code>objectForKey</code> 메서드를 사용하는 것이다.</p><pre><code><span class="type">NSDictionary</span>&lt;<span class="type">NSString</span> *, <span class="type">NSString</span> *&gt; *married = <span class="keyword">@</span>{<span class="string">@"Sam" : @YES,
+                                                  @"John" : @YES,
+                                                  @"Kevin" : @YES,
+                                                  @"William" : @NO};</span>
+<span class="type">NSString</span> *key = <span class="string">@"John";</span>
+<span class="keyword">if</span> ([married objectForKey:key]) {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+} <span class="keyword">else</span> {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is not a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+}
+</code></pre><p>이 방법을 사용하면 크래시 없이 키에 값이 있는지 확인할 수 있다.</p><p>현대적인 Objective-C에서는 서브크립팅(<code>[]</code>) 문법으로 조금 더 편하게 사용할 수 있다.</p><pre><code><span class="comment">// 중복 코드 생략</span>
+<span class="keyword">if</span> (married[key]) {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+} <span class="keyword">else</span> {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is not a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+}
+</code></pre><p>첫 예제와 같은 동작을 하는 코드로 문법만 다르기 때문에 마찬가지로 크래시 없이 사용할 수 있다.</p><h2>JSON 데이터와 NSNull</h2><p>다만, JSON 데이터를 받을 때 의도와 다른 경우가 발생할 수 있다.</p><p><code>NSDictionary</code>는 <code>nil</code>을 값으로 가질 수 없기 때문에 키는 있고 값이 없는 경우, <code>[NSNull null]</code>이 값으로 할당되고는 한다. <strong>Objective-C에서 모든 객체는 조건문에서 <code>true</code>로 평가</strong> 되기 때문에 <code>[NSNull null]</code> 역시 <code>true</code>로 평가된다. <code>@0</code> 혹은 <code>@NO</code> 역시 마찬가지이다. 따라서 값이 <code>[NSNull null]</code>인 키는 조건문에서 값이 있다고 평가된다. 하지만 일반적으로는 값이 없다고 평가되어야 올바른 로직을 구현할 수 있다. 그래서 보통 다음과 같은 매크로를 사용한다.</p><pre><code>#define <span class="call">isNull</span>(value) value == <span class="keyword">nil</span> || [value isKindOfClass:[<span class="type">NSNull</span> <span class="keyword">class</span>]]
+
+<span class="type">NSDictionary</span>&lt;NSString *, <span class="type">NSString</span> *&gt; *married = <span class="keyword">@</span>{<span class="string">@"Sam" : @YES,
+                                                  @"John" : [NSNull null],
+                                                  @"Kevin" : @YES,
+                                                  @"William" : @NO};</span>
+<span class="type">NSString</span> *key = <span class="string">@"John";</span>
+<span class="keyword">if</span> (<span class="call">isNull</span>(married[key])) {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+} <span class="keyword">else</span> {
+    <span class="type">NSString</span> *log = [key stringByAppendingString:<span class="string">@" is not a member."];</span>
+    <span class="type">NSLog</span>(<span class="string">@"%@", log);</span>
+}
+</code></pre><h2>Swift</h2><p>Swift에서는 어떻게 할까? Swift의 <code>Dictionary</code> 타입은 <code>nil</code>을 값으로 가질 수 있으므로 다음과 같은 코드를 만들었다.</p><pre><code><span class="keyword">let</span> married = [<span class="string">"Sam"</span>: <span class="keyword">true</span>,
+               <span class="string">"John"</span>: <span class="keyword">nil</span>,
+               <span class="string">"Kevin"</span>: <span class="keyword">true</span>,
+               <span class="string">"William"</span>: <span class="keyword">false</span>]
+<span class="keyword">let</span> key = <span class="string">"John"</span>
+<span class="keyword">if</span> married[key] != <span class="keyword">nil</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is a member."</span>)
+} <span class="keyword">else</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is not a member."</span>)
+}
+</code></pre><p>결과는 예상과 달리 <em>John is a member.</em> 다. 문제가 뭘까? <code>married</code>의 타입을 확인하면 <code>[String : Bool?]</code>이다. 값이 옵셔널 <code>Bool</code>이기 때문에 문제가 생겼다. 옵셔널을 언랩해야만 원하는 결과를 얻을 수 있다.</p><pre><code><span class="comment">// 중복 코드 생략</span>
+<span class="keyword">if let</span> value = married[key], value != <span class="keyword">nil</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is a member."</span>)
+} <span class="keyword">else</span> {
+    <span class="call">print</span>(<span class="string">"</span>\(key) <span class="string">is not a member."</span>)
+}
+</code></pre><p>이제 결과는 <em>John is not a member.</em>가 되었다.</p><h3>참고</h3><ul><li><a href="http://stackoverflow.com/questions/2784648/how-to-check-if-an-nsdictionary-or-nsmutabledictionary-contains-a-key">objective c - How to check if an NSDictionary or NSMutableDictionary contains a key? - Stack Overflow</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2017-01-07-remove-from-nsmutablearray-while-iterating</guid><title>NSMutableArray를 반복하며 객체 제거하기</title><description></description><link>https://ririsid.github.io/posts/2017-01-07-remove-from-nsmutablearray-while-iterating</link><pubDate>Sat, 7 Jan 2017 19:54:51 +0900</pubDate><content:encoded><![CDATA[<h1><code>NSMutableArray</code>를 반복하며 객체 제거하기</h1><p>Objective-C에서 배열을 반복하면서 조건에 따라 일부 객체를 제거해야할 때가 있다. 우선 배열을 <code>NSMutableArray</code>로 만들고, <code>for-in</code> 문을 통해 바로 조건에 맞지 않는 객체를 제거하려고 했다.</p><pre><code><span class="type">NSArray</span>&lt;<span class="type">NSString</span> *&gt; *originalItems = <span class="keyword">@</span>[<span class="string">@"Sam", @"John", @"Kevin", @"William"];</span>
+<span class="type">NSMutableArray</span>&lt;<span class="type">NSString</span> *&gt; *copiedItems = originalItems.<span class="property">mutableCopy</span>;
+<span class="keyword">for</span> (<span class="type">NSString</span> *item <span class="keyword">in</span> copiedItems) {
+    <span class="keyword">if</span> (item.<span class="property">length</span> &gt; <span class="number">4</span>) {
+        <span class="comment">// 문자열의 길이가 4보다 크면 배열에서 제거한다.</span>
+        [copiedItems removeObject:item];
+    }
+}
+</code></pre><p>이 코드를 실행하면 크래시가 발생한다. <strong>컬렉션 타입이 반복중에 변경</strong>되었기 때문이다. 그래서 반복중에 변경하지 않는 방법으로 다시 만들었다. 조건에 맞지 않는 객체를 제거하지 않고, 반대로 조건에 맞는 객체만 새 배열에 저장해서 사용했다.</p><pre><code><span class="type">NSArray</span>&lt;<span class="type">NSString</span> *&gt; *originalItems = <span class="keyword">@</span>[<span class="string">@"Sam", @"John", @"Kevin", @"William"];</span>
+<span class="type">NSMutableArray</span>&lt;<span class="type">NSString</span> *&gt; *newItems = [<span class="type">NSMutableArray</span> new];
+<span class="keyword">for</span> (<span class="type">NSString</span> *item <span class="keyword">in</span> originalItems) {
+    <span class="keyword">if</span> (item.<span class="property">length</span> &lt;= <span class="number">4</span>) {
+        <span class="comment">// 문자열의 길이가 4보다 작거나 같으면 새 배열에 추가한다.</span>
+        [newItems addObject:item];
+    }
+}
+originalItems = [<span class="type">NSArray</span> arrayWithArray:newItems];
+</code></pre><p>이 방법은 잘 동작하며, 현재 사용중인 방법이다. 하지만 글을 작성하면서 '이 방법이 최선일까?'하는 생각이 들어 다른 방법을 찾아봤다.</p><pre><code><span class="type">NSArray</span>&lt;<span class="type">NSString</span> *&gt; *originalItems = <span class="keyword">@</span>[<span class="string">@"Sam", @"John", @"Kevin", @"William"];</span>
+<span class="type">NSMutableArray</span>&lt;<span class="type">NSString</span> *&gt; *discardedItems = [<span class="type">NSMutableArray</span> new];
+<span class="keyword">for</span> (<span class="type">NSString</span> *item <span class="keyword">in</span> originalItems) {
+    <span class="keyword">if</span> (item.<span class="property">length</span> &gt; <span class="number">4</span>) {
+        <span class="comment">// 문자열의 길이가 4보다 크면 삭제 아이템 배열에 추가한다.</span>
+        [discardedItems addObject:item];
+    }
+}
+<span class="type">NSMutableArray</span>&lt;<span class="type">NSString</span> *&gt; *copiedItems = originalItems.<span class="property">mutableCopy</span>;
+[copiedItems removeObjectsInArray:discardedItems];
+originalItems = [<span class="type">NSArray</span> arrayWithArray:copiedItems];
+</code></pre><p>새 방법은 제거할 아이템 배열을 만들고, <code>removeObjectsInArray:</code> 메서드를 사용해서 한꺼번에 제거한다. 코드는 조금 길어졌지만 의도가 좀 더 잘 반영된 코드다. 원본 배열의 타입이 <code>NSArray</code>가 아니라 <code>NSMutableArray</code>라면 코드도 길어지지 않는다.</p><h2>Swift</h2><p>Swift에서는 어떻게 할까?</p><pre><code><span class="keyword">var</span> originalItems = [<span class="string">"Sam"</span>, <span class="string">"John"</span>, <span class="string">"Kevin"</span>, <span class="string">"William"</span>]
+originalItems = originalItems.<span class="call">filter</span> { $0.<span class="property">characters</span>.<span class="property">count</span> &lt;= <span class="number">4</span> }
+</code></pre><p><code>filter</code> 메서드를 통해 함수형 기법을 사용하면 보다 직관적인 코드를 작성할 수 있다.</p><h2>다시 Objective-C</h2><p>Swift에서 사용한 <code>filter</code>를 Objective-C에서도 사용할 수 있을까?</p><pre><code><span class="type">NSArray</span>&lt;<span class="type">NSString</span> *&gt; *originalItems = <span class="keyword">@</span>[<span class="string">@"Sam", @"John", @"Kevin", @"William"];</span>
+<span class="type">NSPredicate</span> *predicate = [<span class="type">NSPredicate</span> predicateWithFormat:<span class="keyword">@"SELF</span>.<span class="keyword">length</span> &lt;= <span class="string">4"];</span>
+originalItems = [originalItems filteredArrayUsingPredicate:predicate];
+</code></pre><p>가능하다!</p><h3>참고</h3><ul><li><a href="http://stackoverflow.com/questions/111866/best-way-to-remove-from-nsmutablearray-while-iterating">objective c - Best way to remove from NSMutableArray while iterating? - Stack Overflow</a></li><li><a href="http://stackoverflow.com/questions/1728475/nsarray-remove-item-from-array">iphone - NSArray + remove item from array - Stack Overflow</a></li><li><a href="http://stackoverflow.com/questions/19676371/how-to-filter-nsarray-using-predicate-on-an-object-property">ios - How to filter NSArray using predicate on an object property - Stack Overflow</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-nested-types-digest</guid><title>Swift 프로그래밍 언어 - 중첩 타입</title><description></description><link>https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-nested-types-digest</link><pubDate>Tue, 28 Jul 2015 23:13:14 +0900</pubDate><content:encoded><![CDATA[<h1>Swift 스터디 5주차 (2015-08-01)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>중첩 타입(Nested Types)</h2><ul><li><code>enum</code>은 종종 특정 <code>class</code>나 <code>struct</code>의 기능을 돕기 위해 만들어진다. 마찬가지로 더 복잡한 타입에서 사용하기 위한 유틸리티 <code>class</code>와 <code>struct</code>의 정의를 편하게 한다.</li><li>이를 만족시키기 위해 Swift에서는 <em>중첩 타입(nested types)</em>을 정의할 수 있다.</li><li>다른 타입 안에 또 다른 타입을 중첩하기 위해, 지원하는 타입의 바깥 중괄호 안에 정의를 작성한다.</li><li>타입은 필요한만큼 여러 단계로 중첩할 수 있다.</li></ul><h3>중첩 타입 사용(Nested Types in Action)</h3><pre><code><span class="keyword">struct</span> BlackjackCard {
+
+    <span class="comment">// nested Suit enumeration</span>
+    <span class="keyword">enum</span> Suit: <span class="type">Character</span> {
+        <span class="keyword">case</span> <span class="type">Spades</span> = <span class="string">"♠"</span>, <span class="type">Hearts</span> = <span class="string">"♡"</span>, <span class="type">Diamonds</span> = <span class="string">"♢"</span>, <span class="type">Clubs</span> = <span class="string">"♣"</span>
+    }
+
+    <span class="comment">// nested Rank enumeration</span>
+    <span class="keyword">enum</span> Rank: <span class="type">Int</span> {
+        <span class="keyword">case</span> <span class="type">Two</span> = <span class="number">2</span>, <span class="type">Three</span>, <span class="type">Four</span>, <span class="type">Five</span>, <span class="type">Six</span>, <span class="type">Seven</span>, <span class="type">Eight</span>, <span class="type">Nine</span>, <span class="type">Ten</span>
+        <span class="keyword">case</span> <span class="type">Jack</span>, <span class="type">Queen</span>, <span class="type">King</span>, <span class="type">Ace</span>
+        <span class="keyword">struct</span> Values {
+            <span class="keyword">let</span> first: <span class="type">Int</span>, second: <span class="type">Int</span>?
+        }
+        <span class="keyword">var</span> values: <span class="type">Values</span> {
+            <span class="keyword">switch self</span> {
+            <span class="keyword">case</span> .<span class="dotAccess">Ace</span>:
+                <span class="keyword">return</span> <span class="type">Values</span>(first: <span class="number">1</span>, second: <span class="number">11</span>)
+            <span class="keyword">case</span> .<span class="dotAccess">Jack</span>, .<span class="dotAccess">Queen</span>, .<span class="dotAccess">King</span>:
+                <span class="keyword">return</span> <span class="type">Values</span>(first: <span class="number">10</span>, second: <span class="keyword">nil</span>)
+            <span class="keyword">default</span>:
+                <span class="keyword">return</span> <span class="type">Values</span>(first: <span class="keyword">self</span>.<span class="property">rawValue</span>, second: <span class="keyword">nil</span>)
+            }
+        }
+    }
+
+    <span class="comment">// BlackjackCard properties and methods</span>
+    <span class="keyword">let</span> rank: <span class="type">Rank</span>, suit: <span class="type">Suit</span>
+    <span class="keyword">var</span> description: <span class="type">String</span> {
+        <span class="keyword">var</span> output = <span class="string">"suit is</span> \(suit.<span class="property">rawValue</span>)<span class="string">,"</span>
+        output += <span class="string">" value is</span> \(rank.<span class="property">values</span>.<span class="property">first</span>)<span class="string">"</span>
+        <span class="keyword">if let</span> second = rank.<span class="property">values</span>.<span class="property">second</span> {
+            output += <span class="string">" or</span> \(second)<span class="string">"</span>
+        }
+        <span class="keyword">return</span> output
+    }
+}
+</code></pre><pre><code><span class="keyword">let</span> theAceOfSpades = <span class="type">BlackjackCard</span>(rank: .<span class="dotAccess">Ace</span>, suit: .<span class="dotAccess">Spades</span>)
+<span class="call">print</span>(<span class="string">"theAceOfSpades:</span> \(theAceOfSpades.<span class="property">description</span>)<span class="string">"</span>)
+<span class="comment">// prints "theAceOfSpades: suit is ♠, value is 1 or 11"</span>
+</code></pre><h3>중첩 타입 참조(Referring to Nested Types)</h3><ul><li>정의된 문맥 밖에서 중첩 타입을 사용하려면, 이름 앞에 그것을 포함하고 있는 타입의 이름을 놓는다.</li></ul><pre><code><span class="keyword">let</span> heartsSymbol = <span class="type">BlackjackCard</span>.<span class="type">Suit</span>.<span class="type">Hearts</span>.<span class="property">rawValue</span>
+<span class="comment">// heartsSymbol is "♡"</span>
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-type-casting-digest</guid><title>Swift 프로그래밍 언어 - 타입 변환</title><description></description><link>https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-type-casting-digest</link><pubDate>Tue, 28 Jul 2015 21:32:31 +0900</pubDate><content:encoded><![CDATA[<h1>Swift 스터디 5주차 (2015-08-01)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>타입 변환(Type Casting)</h2><ul><li><em>타입 변환(Type Casting)</em>은 인스턴스의 타입을 확인하는 방법이다. 또는 그 인스턴스를 자신의 클래스 계층에 속한 슈퍼클래스 또는 서브클래스인 것처럼 속이는 것이다.</li><li>Swift에서 타입 변환은 <code>is</code> 또는 <code>as</code> 연산자를 써서 구현된다.</li><li>타입이 프로토콜을 따르는 지 확인할 때도 타입 변환을 쓸 수 있다.</li></ul><h3>타입 변환을 위한 클래스 계층 선언</h3><pre><code><span class="keyword">class</span> MediaItem {
+    <span class="keyword">var</span> name: <span class="type">String</span>
+    <span class="keyword">init</span>(name: <span class="type">String</span>) {
+        <span class="keyword">self</span>.<span class="property">name</span> = name
+    }
+}
+</code></pre><pre><code><span class="keyword">class</span> Movie: <span class="type">MediaItem</span> {
+    <span class="keyword">var</span> director: <span class="type">String</span>
+    <span class="keyword">init</span>(name: <span class="type">String</span>, director: <span class="type">String</span>) {
+        <span class="keyword">self</span>.<span class="property">director</span> = director
+        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name)
+    }
+}
+
+<span class="keyword">class</span> Song: <span class="type">MediaItem</span> {
+    <span class="keyword">var</span> artist: <span class="type">String</span>
+    <span class="keyword">init</span>(name: <span class="type">String</span>, artist: <span class="type">String</span>) {
+        <span class="keyword">self</span>.<span class="property">artist</span> = artist
+        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name)
+    }
+}
+</code></pre><pre><code><span class="keyword">let</span> library = [
+    <span class="type">Movie</span>(name: <span class="string">"Casablanca"</span>, director: <span class="string">"Michael Curtiz"</span>),
+    <span class="type">Song</span>(name: <span class="string">"Blue Suede Shoes"</span>, artist: <span class="string">"Elvis Presley"</span>),
+    <span class="type">Movie</span>(name: <span class="string">"Citizen Kane"</span>, director: <span class="string">"Orson Welles"</span>),
+    <span class="type">Song</span>(name: <span class="string">"The One And Only"</span>, artist: <span class="string">"Chesney Hawkes"</span>),
+    <span class="type">Song</span>(name: <span class="string">"Never Gonna Give You Up"</span>, artist: <span class="string">"Rick Astley"</span>)
+]
+<span class="comment">// the type of "library" is inferred to be [MediaItem]</span>
+</code></pre><ul><li>Swift의 타입 체커(type checker)는 <code>Movie</code>와 <code>Song</code>가 공통 슈퍼클래스인 <code>MediaItem</code>을 가지고 있다고 추정할 수 있고, <code>library</code>를 <code>[MediaItem]</code>로 추론한다.</li><li><code>library</code>에 있는 아이템들은 여전히 <code>Movie</code>와 <code>Song</code> 인스턴스다.</li><li>하지만 이 배열의 내용을 순회한다면 아이템들은 <code>Movie</code>나 <code>Song</code>이 아닌 <code>MediaItem</code>으로 반환 받는다.</li><li>그것들을 자신의 타입으로 사용하기 위해 타입을 <em>확인(check)</em>하거나 다른 타입으로 <em>다운캐스트(downcast)</em>해야 한다.</li></ul><h3>타입 확인</h3><ul><li>타입 확인 연산자(<code>is</code>)를 사용해 인스턴스가 특정 서브클래스인지 확인한다.</li><li>타입 확인 연산자는 인스턴스가 특정 서브클래스면 <code>true</code>를 반환하고, 아니면 <code>false</code>를 반환한다.</li></ul><pre><code><span class="keyword">var</span> movieCount = <span class="number">0</span>
+<span class="keyword">var</span> songCount = <span class="number">0</span>
+
+<span class="keyword">for</span> item <span class="keyword">in</span> library {
+    <span class="keyword">if</span> item <span class="keyword">is</span> <span class="type">Movie</span> {
+        ++movieCount
+    } <span class="keyword">else if</span> item <span class="keyword">is</span> <span class="type">Song</span> {
+        ++songCount
+    }
+}
+
+<span class="call">print</span>(<span class="string">"Media library contains</span> \(movieCount) <span class="string">movies and</span> \(songCount) <span class="string">songs"</span>)
+<span class="comment">// prints "Media library contains 2 movies and 3 songs"</span>
+</code></pre><h3>다운캐스팅(Downcasting)</h3><ul><li>특정 클래스 타입의 상수나 변수는 실제로 서브클래스의 인스턴스를 가리키고 있을 수 있다.</li><li>이런 경우 <em>타입 변환 연산자(type cast operator)</em>(<code>as?</code> 또는 <code>as!</code>)를 사용해 서브클래스 타입으로 다운캐스트(<em>downcast</em>)를 시도할 수 있다.</li><li>다운캐스트는 실패할 수 있기 때문에 두 가지 형식이다.</li><li>조건 형식(conditional form), <code>as?</code>는 다운캐스트 하려는 타입의 옵셔널 값을 반환한다.</li><li>강제 형식(forced form), <code>as!</code>는 다운캐스트를 시도하고 결과를 강제추출(force-unwraps)한다.</li><li>다운캐스트가 성공할 지 확실하지 않을 때는 조건 형식 <code>as?</code>를 사용하라. 다운캐스트가 불가능할 때 그 값은 <code>nil</code>이 될 것이다.</li><li>다운캐스트가 항상 성공할 때만 강제 형식 <code>as!</code>를 사용하라. 잘못된 타입으로 다운캐스트를 시도하면 런타임 에러가 발생한다.</li></ul><pre><code><span class="keyword">for</span> item <span class="keyword">in</span> library {
+    <span class="keyword">if let</span> movie = item <span class="keyword">as</span>? <span class="type">Movie</span> {
+        <span class="call">print</span>(<span class="string">"Movie: '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+    } <span class="keyword">else if let</span> song = item <span class="keyword">as</span>? <span class="type">Song</span> {
+        <span class="call">print</span>(<span class="string">"Song: '</span>\(song.<span class="property">name</span>)<span class="string">', by</span> \(song.<span class="property">artist</span>)<span class="string">"</span>)
+    }
+}
+
+<span class="comment">// Movie: 'Casablanca', dir. Michael Curtiz
+// Song: 'Blue Suede Shoes', by Elvis Presley
+// Movie: 'Citizen Kane', dir. Orson Welles
+// Song: 'The One And Only', by Chesney Hawkes
+// Song: 'Never Gonna Give You Up', by Rick Astley</span>
+</code></pre><blockquote><p>변환(casting)은 인스턴스나 그 값을 실제로 변경하지 않는다. 기저의 인스턴스는 그대로 있고, 단순히 타입의 인스턴스로 속이고 접근한다.</p></blockquote><h3><code>Any</code>와 <code>AnyObject</code>로 타입 변환</h3><ul><li>Swift는 불특정 타입으로 작업하기 위한 두 가지 특별한 타입 별칭(alias)을 제공한다.<ul><li><code>AnyObject</code>는 어떤 <code>class</code> 타입의 인스턴스도 표현할 수 있다.</li><li><code>Any</code>는 함수 타입을 포함한 모든 타입의 인스턴스를 표현할 수 있다.</li></ul></li></ul><blockquote><p><code>AnyObject</code>와 <code>Any</code>는 그것이 제공하는 행동이나 능력이 꼭 필요할 때만 사용하라. 코드에서 기대하는 타입에 대해 명확히 하는 것은 항상 좋다.</p></blockquote><h4><code>AnyObject</code></h4><ul><li>Cocoa API로 작업을 할 때 <code>[AnyObject]</code> 타입의 배열을 받는 일은 흔하다. 이는 Objective-C가 명시 타입 배열을 가지고 있지 않기 때문이다.</li><li>하지만 때로는 제공된 API에 관한 정보를 통해 각 배열에 포함된 객체의 타입을 확신할 수 있다.</li><li>이런 경우, 강제 타입 변환 연산자(<code>as</code>)를 사용해서 옵셔널 언래핑(optional unwrapping)을 사용하지 않고, 배열 안의 각 아이템을 <code>AnyObject</code>보다 더 정확한 클래스 타입으로 다운캐스트 할 수 있다.</li></ul><pre><code><span class="keyword">let</span> someObjects: [<span class="type">AnyObject</span>] = [
+    <span class="type">Movie</span>(name: <span class="string">"2001: A Space Odyssey"</span>, director: <span class="string">"Stanley Kubrick"</span>),
+    <span class="type">Movie</span>(name: <span class="string">"Moon"</span>, director: <span class="string">"Duncan Jones"</span>),
+    <span class="type">Movie</span>(name: <span class="string">"Alien"</span>, director: <span class="string">"Ridley Scott"</span>)
+]
+</code></pre><pre><code><span class="keyword">for</span> object <span class="keyword">in</span> someObjects {
+    <span class="keyword">let</span> movie = object <span class="keyword">as</span>! <span class="type">Movie</span>
+    <span class="call">print</span>(<span class="string">"Movie: '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+}
+<span class="comment">// Movie: '2001: A Space Odyssey', dir. Stanley Kubrick
+// Movie: 'Moon', dir. Duncan Jones
+// Movie: 'Alien', dir. Ridley Scott</span>
+</code></pre><pre><code><span class="keyword">for</span> movie <span class="keyword">in</span> someObjects <span class="keyword">as</span>! [<span class="type">Movie</span>] {
+    <span class="call">print</span>(<span class="string">"Movie: '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+}
+<span class="comment">// Movie: '2001: A Space Odyssey', dir. Stanley Kubrick
+// Movie: 'Moon', dir. Duncan Jones
+// Movie: 'Alien', dir. Ridley Scott</span>
+</code></pre><h4><code>Any</code></h4><ul><li><code>Any</code>를 사용해서 함수 타입과 클래스가 아닌 타입을 포함한 복합 타입으로 작업할 수 있다.</li></ul><pre><code><span class="keyword">var</span> things = [<span class="type">Any</span>]()
+
+things.<span class="call">append</span>(<span class="number">0</span>)
+things.<span class="call">append</span>(<span class="number">0.0</span>)
+things.<span class="call">append</span>(<span class="number">42</span>)
+things.<span class="call">append</span>(<span class="number">3.14159</span>)
+things.<span class="call">append</span>(<span class="string">"hello"</span>)
+things.<span class="call">append</span>((<span class="number">3.0</span>, <span class="number">5.0</span>))
+things.<span class="call">append</span>(<span class="type">Movie</span>(name: <span class="string">"Ghostbusters"</span>, director: <span class="string">"Ivan Reitman"</span>))
+things.<span class="call">append</span>({ (name: <span class="type">String</span>) -&gt; <span class="type">String</span> <span class="keyword">in</span> <span class="string">"Hello,</span> \(name)<span class="string">"</span> })
+</code></pre><ul><li><code>switch</code> 문의 케이스(case)에서 <code>is</code>와 <code>as</code> 연산자를 사용해서 <code>Any</code> 혹은 <code>AnyObject</code> 타입으로만 알고 있는 상수나 변수의 지정 타입을 알 수 있다.</li></ul><pre><code><span class="keyword">for</span> thing <span class="keyword">in</span> things {
+    <span class="keyword">switch</span> thing {
+    <span class="keyword">case</span> <span class="number">0</span> <span class="keyword">as</span> <span class="type">Int</span>:
+        <span class="call">print</span>(<span class="string">"zero as an Int"</span>)
+    <span class="keyword">case</span> <span class="number">0</span> <span class="keyword">as</span> <span class="type">Double</span>:
+        <span class="call">print</span>(<span class="string">"zero as a Double"</span>)
+    <span class="keyword">case let</span> someInt <span class="keyword">as</span> <span class="type">Int</span>:
+        <span class="call">print</span>(<span class="string">"an integer value of</span> \(someInt)<span class="string">"</span>)
+    <span class="keyword">case let</span> someDouble <span class="keyword">as</span> <span class="type">Double</span> <span class="keyword">where</span> someDouble &gt; <span class="number">0</span>:
+        <span class="call">print</span>(<span class="string">"a positive double value of</span> \(someDouble)<span class="string">"</span>)
+    <span class="keyword">case is</span> <span class="type">Double</span>:
+        <span class="call">print</span>(<span class="string">"some other double value that I don't want to print"</span>)
+    <span class="keyword">case let</span> someString <span class="keyword">as</span> <span class="type">String</span>:
+        <span class="call">print</span>(<span class="string">"a string value of \"</span>\(someString)<span class="string">\"")</span>
+    <span class="keyword">case let</span> (x, y) <span class="keyword">as</span> (<span class="type">Double</span>, <span class="type">Double</span>):
+        <span class="call">print</span>(<span class="string">"an (x, y) point at</span> \(x)<span class="string">,</span> \(y)<span class="string">"</span>)
+    <span class="keyword">case let</span> movie <span class="keyword">as</span> <span class="type">Movie</span>:
+        <span class="call">print</span>(<span class="string">"a movie called '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+    <span class="keyword">case let</span> stringConverter <span class="keyword">as</span> <span class="type">String</span> -&gt; <span class="type">String</span>:
+        <span class="call">print</span>(<span class="call">stringConverter</span>(<span class="string">"Michael"</span>))
+    <span class="keyword">default</span>:
+        <span class="call">print</span>(<span class="string">"something else"</span>)
+    }
+}
+
+<span class="comment">// zero as an Int
+// zero as a Double
+// an integer value of 42
+// a positive double value of 3.14159
+// a string value of "hello"
+// an (x, y) point at 3.0, 5.0
+// a movie called 'Ghostbusters', dir. Ivan Reitman
+// Hello, Michael</span>
+</code></pre><blockquote><p><code>switch</code> 문의 케이스는 타입을 확인하고 변환하기 위해 강제 타입 변환 연산자(<code>as</code>, <code>as?</code> 아님)를 사용한다. 이 방법은 <code>switch</code> 케이스 문의 문맥 안에서 항상 안전하다.</p></blockquote>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2015-07-26-the-swift-programming-language-swift-2-prerelease-error-handling-digest</guid><title>Swift 프로그래밍 언어 - 오류 처리</title><description></description><link>https://ririsid.github.io/posts/2015-07-26-the-swift-programming-language-swift-2-prerelease-error-handling-digest</link><pubDate>Sun, 26 Jul 2015 23:31:01 +0900</pubDate><content:encoded><![CDATA[<h1>Swift 스터디 5주차 (2015-08-01)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>오류 처리(Error Handling)</h2><ul><li>Swift는 런타임에 회복 가능한 오류(recoverable errors)를 던지고(throwing), 받고(catching), 전파하고(propagating), 조작하도록(manipulating) 돕는 퍼스트 클래스를 제공한다.</li><li>어떤 함수와 메서드는 항상 실행이 완료되거나 유용한 결과를 내놓는다고 보장하지 않는다.</li><li>옵셔널은 값이 없을 수 있음을 표현한다. 하지만 때로는 함수가 실패했을 때, 어떻게 실패했는지 알고 거기에 대응하는 게 더 유용하다.</li><li>예를 들어 파일을 읽고 처리한다고 하자. 이 작업이 실패하는 경우는 여러가지이다. 지정한 위치(path)에 파일이 없거나, 읽기 권한이 없거나, 적절한 포멧으로 인코딩되지 않았거나. 이러한 구분은 프로그램이 오류를 해결하고, 회복하고, 필요하면 사용자에게 알리는 것을 가능하게 한다.</li></ul><blockquote><p>Swift의 오류 처리 패턴은 Cocoa와 Objective-C의 <code>NSError</code>와 함께 쓸 수 있다.</p></blockquote><h3>오류 표현</h3><ul><li>Swift에서 오류는 <code>ErrorType</code> 프로토콜을 따르는 타입의 값으로 표현된다.</li><li><code>enum</code>은 오류에 대한 추가정보를 가진 관련 값을 포함한 관계된 오류 상태 그룹을 모델링하는데 적합하다.</li><li>이는 <code>enum</code>이 <code>ErrorType</code>을 채용하면, 컴파일러에 의해 합성된 구현을 자동으로 가지기 때문이다.</li><li>다음은 자판기의 오류 상태의 표현의 예제다.</li></ul><pre><code><span class="keyword">enum</span> VendingMachineError: <span class="type">ErrorType</span> {
+    <span class="keyword">case</span> <span class="type">InvalidSelection</span>
+    <span class="keyword">case</span> <span class="type">InsufficientFunds</span>(required: <span class="type">Double</span>)
+    <span class="keyword">case</span> <span class="type">OutOfStock</span>
+}
+</code></pre><h3>오류 던지기(Throwing Errors)</h3><ul><li>함수나 메서드의 정의에서 파라미터 다음에 <code>throws</code> 키워드를 써서 그 함수나 메서드가 오류를 던질 수 있다는 것을 표시한다.</li><li>반환 타입이 있으면 <code>throws</code> 키워드를 반환 화살표(<code>-&gt;</code>) 전에 적어야 한다.</li><li>함수, 메서드, 클로저는 명시적으로 표시하지 않으면 오류를 던질 수 없다.</li></ul><pre><code><span class="keyword">func</span> canThrowErrors() <span class="keyword">throws</span> -&gt; <span class="type">String</span>
+
+<span class="keyword">func</span> cannotThrowErrors() -&gt; <span class="type">String</span>
+</code></pre><ul><li>던지는 함수(throwing function)의 본문 어디서나 <code>throw</code> 구문을 써서 오류를 던질 수 있다.</li></ul><pre><code><span class="keyword">struct</span> Item {
+    <span class="keyword">var</span> price: <span class="type">Double</span>
+    <span class="keyword">var</span> count: <span class="type">Int</span>
+}
+
+<span class="keyword">var</span> inventory = [
+    <span class="string">"Candy Bar"</span>: <span class="type">Item</span>(price: <span class="number">1.25</span>, count: <span class="number">7</span>),
+    <span class="string">"Chips"</span>: <span class="type">Item</span>(price: <span class="number">1.00</span>, count: <span class="number">4</span>),
+    <span class="string">"Pretzels"</span>: <span class="type">Item</span>(price: <span class="number">0.75</span>, count: <span class="number">11</span>)
+]
+<span class="keyword">var</span> amountDeposited = <span class="number">1.00</span>
+
+<span class="keyword">func</span> vend(itemNamed name: <span class="type">String</span>) <span class="keyword">throws</span> {
+    <span class="keyword">guard var</span> item = inventory[name] <span class="keyword">else</span> {
+        <span class="keyword">throw</span> <span class="type">VendingMachineError</span>.<span class="type">InvalidSelection</span>
+    }
+
+    <span class="keyword">guard</span> item.<span class="property">count</span> &gt; <span class="number">0</span> <span class="keyword">else</span> {
+        <span class="keyword">throw</span> <span class="type">VendingMachineError</span>.<span class="type">OutOfStock</span>
+    }
+
+    <span class="keyword">if</span> amountDeposited &gt;= item.<span class="property">price</span> {
+        <span class="comment">// Dispense the snack</span>
+        amountDeposited -= item.<span class="property">price</span>
+        --item.<span class="property">count</span>
+        inventory[name] = item
+    } <span class="keyword">else</span> {
+        <span class="keyword">let</span> amountRequired = item.<span class="property">price</span> - amountDeposited
+        <span class="keyword">throw</span> <span class="type">VendingMachineError</span>.<span class="type">InsufficientFunds</span>(required: amountRequired)
+    }
+}
+</code></pre><pre><code><span class="keyword">let</span> favoriteSnacks = [
+    <span class="string">"Alice"</span>: <span class="string">"Chips"</span>,
+    <span class="string">"Bob"</span>: <span class="string">"Licorice"</span>,
+    <span class="string">"Eve"</span>: <span class="string">"Pretzels"</span>,
+]
+<span class="keyword">func</span> buyFavoriteSnack(person: <span class="type">String</span>) <span class="keyword">throws</span> {
+    <span class="keyword">let</span> snackName = favoriteSnacks[person] ?? <span class="string">"Candy Bar"</span>
+    <span class="keyword">try</span> <span class="call">vend</span>(itemNamed: snackName)
+}
+</code></pre><h3>오류 받고 처리하기(Catching and Handling Errors)</h3><ul><li><code>do-catch</code> 문을 사용해서 오류를 받고 처리할 수 있다.</li></ul><pre><code><span class="keyword">do</span> {
+    <span class="keyword">try</span> function that <span class="keyword">throws</span>
+    statements
+} <span class="keyword">catch</span> pattern {
+    statements
+}
+</code></pre><ul><li>오류가 던져지면 오류는 <code>catch</code> 절을 만날 때까지 바깥 스코프로 전파된다.</li><li><code>switch</code> 문처럼 컴파일러는 <code>catch</code> 절이 완전한지 추론한다. 그렇게 판단하면 오류가 관리되고 있다고 간주한다.</li><li>그렇지 않으면 포함하고 있는 영역에서 오류를 처리해야 한다. 또는 포함하고 있는 함수가 <code>throws</code>와 함께 정의되어야 한다.</li><li>오류가 처리되는 것을 보장하기 위해 모든 오류에 대응하는 패턴으로 <code>catch</code> 절을 사용한다.</li><li>만약 <code>catch</code> 절이 패턴을 특징 짓지 않는다면, 모든 오류를 <code>error</code> 라는 이름의 지역 변수로 연결한다.</li></ul><pre><code><span class="keyword">do</span> {
+    <span class="keyword">try</span> <span class="call">vend</span>(itemNamed: <span class="string">"Candy Bar"</span>)
+    <span class="comment">// Enjoy delicious snack</span>
+} <span class="keyword">catch</span> <span class="type">VendingMachineError</span>.<span class="type">InvalidSelection</span> {
+    <span class="call">print</span>(<span class="string">"Invalid Selection."</span>)
+} <span class="keyword">catch</span> <span class="type">VendingMachineError</span>.<span class="type">OutOfStock</span> {
+    <span class="call">print</span>(<span class="string">"Out of Stock."</span>)
+} <span class="keyword">catch</span> <span class="type">VendingMachineError</span>.<span class="type">InsufficientFunds</span>(<span class="keyword">let</span> amountRequired) {
+    <span class="call">print</span>(<span class="string">"Insufficient funds. Please insert an additional $</span>\(amountRequired)<span class="string">."</span>)
+}
+</code></pre><ul><li>위 예제에서 <code>vend(itemNamed:)</code>는 오류를 던질 수 있기 때문에 <code>try</code> 표현식으로 호출된다.</li><li>오류가 던져지면 실행(execution)은 즉시 <code>catch</code> 절로 전달되고, 전파를 계속할 지 결정한다.</li><li>오류가 던져지지 않으면 <code>snack</code>에 <code>vend(itemNamed:)</code> 반환 값이 할당되고, <code>do</code> 문에 있는 남은 구문이 실행된다.</li></ul><h4>오류 전파(Propagation) 막기</h4><ul><li>어떤 경우는 던지기 함수나 메서드가 실행중에 오류를 던지지 않을 것을 알 수 있다. 이런 경우, <code>try!</code>를 쓰는 <em>강제 시도(forced-try)</em> 표현식을 통해 던지기 함수나 메서드를 호출할 수 있다.</li><li><code>try!</code>를 써서 던지기 함수나 메서드를 호출하면 오류 전파를 막고, 실행 중에 오류가 던져지지 않는다고 포장한다.</li><li>실제로 오류가 던져지면 런타임 오류가 발생한다.</li></ul><pre><code><span class="keyword">func</span> willOnlyThrowIfTrue(value: <span class="type">Bool</span>) <span class="keyword">throws</span> {
+    <span class="keyword">if</span> value { <span class="keyword">throw</span> someError }
+}
+
+<span class="keyword">do</span> {
+    <span class="keyword">try</span> <span class="call">willOnlyThrowIfTrue</span>(<span class="keyword">false</span>)
+} <span class="keyword">catch</span> {
+    <span class="comment">// Handle Error</span>
+}
+
+<span class="keyword">try</span>! <span class="call">willOnlyThrowIfTrue</span>(<span class="keyword">false</span>)
+</code></pre><h4>정리(Clean-Up) 행동 지정</h4><ul><li><code>defer</code> 문을 사용해 일부 구문을 실행(execution)이 현재 코드 블럭을 떠나기 직전에 실행하도록 할 수 있다.</li><li>이것을 이용해 오류가 발생하든 안하든 실행해야 하는 정리 작업을 할 수 있다.</li><li>예를 들면 열린 파일 서술자를 닫고, 직접 할당한 메모리를 해제하는 것이다.</li><li><code>defer</code> 문은 현재 스코프가 끝날 때까지 실행을 지연한다.</li><li>지연된 구문은 <code>break</code> 나 <code>return</code> 문 또는 오류를 던지는 것과 같이 문장 밖으로 제어를 넘기는 코드를 포함하지 않는다.</li><li>지연된 행동은 기술된 순서의 반대로 실행된다. 첫 번째 <code>defer</code> 문이 두 번째 <code>defer</code> 문 다음에 실행된다.</li></ul><pre><code><span class="keyword">func</span> processFile(filename: <span class="type">String</span>) <span class="keyword">throws</span> {
+    <span class="keyword">if</span> <span class="call">exists</span>(filename) {
+        <span class="keyword">let</span> file = <span class="call">open</span>(filename)
+        <span class="keyword">defer</span> {
+            <span class="call">close</span>(file)
+        }
+        <span class="keyword">while let</span> line = <span class="keyword">try</span> file.<span class="call">readline</span>() {
+            <span class="comment">// Work with the file.</span>
+        }
+        <span class="comment">// close(file) is called here, at the end of the scope.</span>
+    }
+}
+</code></pre><ul><li>위 예제에서 <code>defer</code> 문을 써서 <code>open(_:)</code> 문이 대응하는 <code>close(_:)</code> 문이 호출되는 것을 보장한다.</li><li>이 호출은 오류가 던져지든 않든 상관 없다.</li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2015-07-17-the-swift-programming-language-swift-2-prerelease-properties-digest</guid><title>Swift 프로그래밍 언어 - 프로퍼티</title><description></description><link>https://ririsid.github.io/posts/2015-07-17-the-swift-programming-language-swift-2-prerelease-properties-digest</link><pubDate>Fri, 17 Jul 2015 23:47:48 +0900</pubDate><content:encoded><![CDATA[<h1>Swift 스터디 3주차 (2015-07-18)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>프로퍼티(Properties)</h2><ul><li>프로퍼티는 값들을 각각의 <code>class</code>, <code>struct</code>, <code>enum</code>과 결합시킨다.</li><li>저장 프로퍼티(stored properties)는 상수와 변수를 인스턴스의 일부로 저장한다.</li><li>계산 프로퍼티(computed properties)는 값을 저장하는 대신 계산한다.</li><li>계산 프로퍼티는 <code>class</code>, <code>struct</code>, <code>enum</code>에서 쓸 수 있다.</li><li>저장 프로퍼티는 <code>class</code>와 <code>struct</code>에서만 쓸 수 있다.</li></ul><h3>저장 프로퍼티</h3><ul><li>저장 프로퍼티는 변수와 상수 모두 쓸 수 있다.</li><li><code>var</code> 키워드를 사용하면 <em>변수 저장 프로퍼티(variable stored properties)</em>가 된다.</li><li><code>let</code> 키워드를 사용하면 <em>상수 저장 프로퍼티(constant stored properties)</em>가 된다.</li><li>저장 프로퍼티에 기본값을 지정할 수 있다. <em>(다음 챕터 참조)</em></li></ul><h4>상수 <code>struct</code> 인스턴스의 저장 프로퍼티</h4><ul><li><code>struct</code> 인스턴스를 상수로 할당했다면, 인스턴스의 <strong>변수 프로퍼티</strong>까지 수정할 수 없다.</li><li>이는 <code>struct</code>가 값 타입이기 때문이다.</li><li><code>class</code>는 참조 타입이기 때문에 상수에 할당해도 변수 프로퍼티를 바꿀 수 있다.</li></ul><h4>지연 저장 프로퍼티</h4><ul><li>지연 저장 프로퍼티는 한 번 사용되기 전에는 계산되지 않는다.</li><li><code>lazy</code> 식별자를 프로퍼티 선언 앞에 표시하면 사용할 수 있다.</li><li>지연 프로퍼티는 항상 변수로 선언해야 한다. 상수는 항상 초기화가 완료되기 전에 값을 가지기 때문이다.</li><li>지연 프로퍼티는 인스턴스의 초기화가 완료된 뒤까지 알지 못하는 외부 요인에 의존해 프로퍼티를 초기화할 때 유용하다.</li><li>또한, 사용하지 않거나 필요 없을 지도 모르면서 비싼 댓가를 치뤄야하는 프로퍼티를 초기화할 때도 유용하다.</li><li>다음 예제에서 <code>DataImporter</code>는 초기화되지 않는다.</li></ul><pre><code><span class="keyword">class</span> DataImporter {
+    <span class="comment">/*
+    DataImporter is a class to import data from an external file.
+    The class is assumed to take a non-trivial amount of time to initialize.
+    */</span>
+    <span class="keyword">var</span> fileName = <span class="string">"data.txt"</span>
+    <span class="comment">// the DataImporter class would provide data importing functionality here</span>
+}
+
+<span class="keyword">class</span> DataManager {
+    <span class="keyword">lazy var</span> importer = <span class="type">DataImporter</span>()
+    <span class="keyword">var</span> data = [<span class="type">String</span>]()
+    <span class="comment">// the DataManager class would provide data management functionality here</span>
+}
+
+<span class="keyword">let</span> manager = <span class="type">DataManager</span>()
+manager.<span class="property">data</span>.<span class="call">append</span>(<span class="string">"Some data"</span>)
+manager.<span class="property">data</span>.<span class="call">append</span>(<span class="string">"Some more data"</span>)
+<span class="comment">// the DataImporter instance for the importer property has not yet been created</span>
+</code></pre><ul><li>다음과 같이 접근하게 되면 초기화된다.</li></ul><pre><code><span class="call">print</span>(manager.<span class="property">importer</span>.<span class="property">fileName</span>)
+<span class="comment">// the DataImporter instance for the importer property has now been created
+// prints "data.txt"</span>
+</code></pre><blockquote><p>지연 프로퍼티를 여러 스레드에서 동시에 접근할 경우 한 번만 초기화된다고 보장하지 않는다.</p></blockquote><h4>저장 프로퍼티와 인스턴스 변수</h4><ul><li>Objective-C에서는 인스턴스 변수와 프로퍼티를 사용해서 값을 저장할 수 있었다.</li><li>Swift는 혼란을 줄이기 위해 프로퍼티만 사용한다.</li></ul><h3>계산 프로퍼티</h3><ul><li>계산 프로퍼티는 값을 진짜로 저장하지 않는다. 대신, 간접적으로 다른 프로퍼티와 값을 사용할 수 있도록 게터와 세터를 제공한다.</li></ul><pre><code><span class="keyword">struct</span> Point {
+    <span class="keyword">var</span> x = <span class="number">0.0</span>, y = <span class="number">0.0</span>
+}
+<span class="keyword">struct</span> Size {
+    <span class="keyword">var</span> width = <span class="number">0.0</span>, height = <span class="number">0.0</span>
+}
+<span class="keyword">struct</span> Rect {
+    <span class="keyword">var</span> origin = <span class="type">Point</span>()
+    <span class="keyword">var</span> size = <span class="type">Size</span>()
+    <span class="keyword">var</span> center: <span class="type">Point</span> {
+        <span class="keyword">get</span> {
+            <span class="keyword">let</span> centerX = origin.<span class="property">x</span> + (size.<span class="property">width</span> / <span class="number">2</span>)
+            <span class="keyword">let</span> centerY = origin.<span class="property">y</span> + (size.<span class="property">height</span> / <span class="number">2</span>)
+            <span class="keyword">return</span> <span class="type">Point</span>(x: centerX, y: centerY)
+        }
+        <span class="call">set</span>(newCenter) {
+            origin.<span class="property">x</span> = newCenter.<span class="property">x</span> - (size.<span class="property">width</span> / <span class="number">2</span>)
+            origin.<span class="property">y</span> = newCenter.<span class="property">y</span> - (size.<span class="property">height</span> / <span class="number">2</span>)
+        }
+    }
+}
+<span class="keyword">var</span> square = <span class="type">Rect</span>(origin: <span class="type">Point</span>(x: <span class="number">0.0</span>, y: <span class="number">0.0</span>),
+    size: <span class="type">Size</span>(width: <span class="number">10.0</span>, height: <span class="number">10.0</span>))
+<span class="keyword">let</span> initialSquareCenter = square.<span class="property">center</span>
+square.<span class="property">center</span> = <span class="type">Point</span>(x: <span class="number">15.0</span>, y: <span class="number">15.0</span>)
+<span class="call">print</span>(<span class="string">"square.origin is now at (</span>\(square.<span class="property">origin</span>.<span class="property">x</span>)<span class="string">,</span> \(square.<span class="property">origin</span>.<span class="property">y</span>)<span class="string">)"</span>)
+<span class="comment">// prints "square.origin is now at (10.0, 10.0)"</span>
+</code></pre><h4>간편 세터 선언</h4><ul><li>세터는 설정하기 위한 값의 이름을 지정하지 않으면, 기본값으로 <code>newValue</code>를 사용한다.</li></ul><pre><code><span class="keyword">struct</span> AlternativeRect {
+    <span class="keyword">var</span> origin = <span class="type">Point</span>()
+    <span class="keyword">var</span> size = <span class="type">Size</span>()
+    <span class="keyword">var</span> center: <span class="type">Point</span> {
+        <span class="keyword">get</span> {
+            <span class="keyword">let</span> centerX = origin.<span class="property">x</span> + (size.<span class="property">width</span> / <span class="number">2</span>)
+            <span class="keyword">let</span> centerY = origin.<span class="property">y</span> + (size.<span class="property">height</span> / <span class="number">2</span>)
+            <span class="keyword">return</span> <span class="type">Point</span>(x: centerX, y: centerY)
+        }
+        <span class="keyword">set</span> {
+            origin.<span class="property">x</span> = newValue.<span class="property">x</span> - (size.<span class="property">width</span> / <span class="number">2</span>)
+            origin.<span class="property">y</span> = newValue.<span class="property">y</span> - (size.<span class="property">height</span> / <span class="number">2</span>)
+        }
+    }
+}
+</code></pre><h4>읽기 전용 계산 프로퍼티</h4><ul><li>계산 프로퍼티에 세터가 없으면 읽기 전용 계산 프로퍼티가 된다.</li></ul><blockquote><p>계산 프로퍼티는 값이 고정이 아니기 때문에 변수로 만들어야만 한다.</p></blockquote><ul><li>읽기 전용 계산 프로퍼티는 <code>get</code> 키워드를 생략할 수 있다.</li></ul><pre><code><span class="keyword">struct</span> Cuboid {
+    <span class="keyword">var</span> width = <span class="number">0.0</span>, height = <span class="number">0.0</span>, depth = <span class="number">0.0</span>
+    <span class="keyword">var</span> volume: <span class="type">Double</span> {
+        <span class="keyword">return</span> width * height * depth
+    }
+}
+<span class="keyword">let</span> fourByFiveByTwo = <span class="type">Cuboid</span>(width: <span class="number">4.0</span>, height: <span class="number">5.0</span>, depth: <span class="number">2.0</span>)
+<span class="call">print</span>(<span class="string">"the volume of fourByFiveByTwo is</span> \(fourByFiveByTwo.<span class="property">volume</span>)<span class="string">"</span>)
+<span class="comment">// prints "the volume of fourByFiveByTwo is 40.0"</span>
+</code></pre><h3>프로퍼티 옵저버</h3><ul><li>프로퍼티 옵저버는 프로퍼티 값의 변화를 관찰한다.</li><li>프로퍼티 옵저버는 프로퍼티 값이 변할 때마다 호출된다. 새로운 값이 이전 값과 같아도 호출된다.</li><li>지연 저장 프로퍼티를 뺀 저장 프로퍼티에 프로퍼티 옵저버를 추가할 수 있다.</li><li>재정의(override)한 상속받은 프로퍼티(저장이든 계산이든)에도 프로퍼티 옵저버를 추가할 수 있다.</li></ul><blockquote><p>직접 구현한 계산 프로퍼티를 위해 프로퍼티 옵저버를 정의할 필요는 없다. 계산 프로퍼티의 세터에서 바로 관찰할 수 있기 때문이다.</p></blockquote><ul><li><code>willSet</code>과 <code>didSet</code> 둘 중 하나 혹은 둘 다 포함할 수 있다.</li><li><code>willSet</code>은 값이 저장되기 전에 호출된다.</li><li><code>didSet</code>은 새 값이 저장된 직후에 호출된다.</li><li><code>willSet</code>에는 새 값이 상수로 전달된다. 기본값은 <code>newValue</code>다.</li><li><code>didSet</code>에는 이전 값이 상수로 전달된다. 기본값은 <code>oldValue</code>다.</li></ul><blockquote><p><code>willSet</code>과 <code>didSet</code> 옵저버는 위임되지 않은 이니셜라이저에서는 호출되지 않는다.</p></blockquote><pre><code><span class="keyword">class</span> StepCounter {
+    <span class="keyword">var</span> totalSteps: <span class="type">Int</span> = <span class="number">0</span> {
+        <span class="call">willSet</span>(newTotalSteps) {
+            <span class="call">print</span>(<span class="string">"About to set totalSteps to</span> \(newTotalSteps)<span class="string">"</span>)
+        }
+        <span class="keyword">didSet</span> {
+            <span class="keyword">if</span> totalSteps &gt; oldValue  {
+                <span class="call">print</span>(<span class="string">"Added</span> \(totalSteps - oldValue) <span class="string">steps"</span>)
+            }
+        }
+    }
+}
+<span class="keyword">let</span> stepCounter = <span class="type">StepCounter</span>()
+stepCounter.<span class="property">totalSteps</span> = <span class="number">200</span>
+<span class="comment">// About to set totalSteps to 200
+// Added 200 steps</span>
+stepCounter.<span class="property">totalSteps</span> = <span class="number">360</span>
+<span class="comment">// About to set totalSteps to 360
+// Added 160 steps</span>
+stepCounter.<span class="property">totalSteps</span> = <span class="number">896</span>
+<span class="comment">// About to set totalSteps to 896
+// Added 536 steps</span>
+</code></pre><h3>전역과 지역 변수</h3><ul><li>계산 프로퍼티와 프로퍼티 옵저버의 기능은 전역 변수와 지역 변수에서도 쓸 수 있다.</li></ul><blockquote><p>전역 상수와 변수는 항상 <em>지연 저장 프로퍼티</em>처럼 지연 처리된다. 지연 저장 프로퍼티와는 달리 <code>lazy</code> 식별자를 붙이지 않는다. 지역 상수와 변수는 절대 지연 처리되지 않는다.</p></blockquote><h3>타입 프로퍼티</h3><ul><li>인스턴스 프로퍼티는 각 타입의 인스턴스에 속한다.</li><li>타입 자체에 프로퍼티를 지정할 수 있다. 이것을 <em>타입 프로퍼티(type properties)</em>라고 부른다.</li><li>값 타입(<code>struct</code>, <code>enum</code>)에서는 저장 타입 프로퍼티와 계산 타입 프로퍼티를 쓸 수 있다.</li><li><code>class</code>에서는 계산 타입 프로퍼티만 쓸 수 있다.</li><li>타입 자체는 이니셜라이저가 없기 때문에, 저장 인스턴스 프로퍼티와 달리 저장 타입 프로퍼티는 항상 기본값을 제공해야 한다.</li></ul><h4>타입 프로퍼티 문법</h4><ul><li><code>static</code> 키워드를 사용해서 타입 프로퍼티를 정의한다.</li><li><code>class</code>의 계산 타입 프로퍼티는 하위 <code>class</code>에서 재정의할 수 있도록 <code>static</code> 대신 <code>class</code> 키워드를 사용할 수 있다.</li></ul><pre><code><span class="keyword">struct</span> SomeStructure {
+    <span class="keyword">static var</span> storedTypeProperty = <span class="string">"Some value."</span>
+    <span class="keyword">static var</span> computedTypeProperty: <span class="type">Int</span> {
+        <span class="keyword">return</span> <span class="number">1</span>
+    }
+}
+<span class="keyword">enum</span> SomeEnumeration {
+    <span class="keyword">static var</span> storedTypeProperty = <span class="string">"Some value."</span>
+    <span class="keyword">static var</span> computedTypeProperty: <span class="type">Int</span> {
+        <span class="keyword">return</span> <span class="number">6</span>
+    }
+}
+<span class="keyword">class</span> SomeClass {
+    <span class="keyword">static var</span> storedTypeProperty = <span class="string">"Some value."</span>
+    <span class="keyword">static var</span> computedTypeProperty: <span class="type">Int</span> {
+        <span class="keyword">return</span> <span class="number">27</span>
+    }
+    <span class="keyword">class var</span> overrideableComputedTypeProperty: <span class="type">Int</span> {
+        <span class="keyword">return</span> <span class="number">107</span>
+    }
+}
+</code></pre><blockquote><p>위 예제는 읽기 전용 계산 타입 프로퍼티지만, 계산 인스턴스 프로퍼티와 같은 문법으로 읽기 쓰기 계산 타입 프로퍼티를 정의할 수 있다.</p></blockquote><h4>타입 프로퍼티 읽고 쓰기</h4><ul><li>타입 프로퍼티는 인스턴스 프로퍼티와 마찬가지로 닷(<code>.</code>) 문법을 통해 읽고 쓸 수 있다.</li><li>하지만 타입 프로퍼티는 인스턴스가 아닌 타입에 읽고 쓴다.</li></ul><pre><code><span class="call">print</span>(<span class="type">SomeStructure</span>.<span class="property">storedTypeProperty</span>)
+<span class="comment">// prints "Some value."</span>
+<span class="type">SomeStructure</span>.<span class="property">storedTypeProperty</span> = <span class="string">"Another value."</span>
+<span class="call">print</span>(<span class="type">SomeStructure</span>.<span class="property">storedTypeProperty</span>)
+<span class="comment">// prints "Another value."</span>
+<span class="call">print</span>(<span class="type">SomeEnumeration</span>.<span class="property">computedTypeProperty</span>)
+<span class="comment">// prints "6"</span>
+<span class="call">print</span>(<span class="type">SomeClass</span>.<span class="property">computedTypeProperty</span>)
+<span class="comment">// prints "27"</span>
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://ririsid.github.io/posts/2015-07-07-the-swift-programming-language-swift-2-prerelease-strings-and-characters-digest</guid><title>Swift 프로그래밍 언어 - 문자열과 문자</title><description></description><link>https://ririsid.github.io/posts/2015-07-07-the-swift-programming-language-swift-2-prerelease-strings-and-characters-digest</link><pubDate>Tue, 7 Jul 2015 23:59:45 +0900</pubDate><content:encoded><![CDATA[<h1>Swift 스터디 1주차 (2015-07-04)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>문자열과 문자(Strings and Characters)</h2><ul><li>Swift의 문자열은 <code>String</code> 타입으로 표현된다.</li><li><code>String</code> 타입은 <code>Character</code> 타입 값의 묶음이다.</li><li>Swift의 <code>String</code>과 <code>Character</code> 타입은 빠르고, 유니코드를 준수한다.</li><li>모든 문자열은 인코딩 독립적인 유니코드로 구성되고, 다양한 유니코드 표현법으로 접근할 수 있다.</li></ul><p>Swift의 <code>String</code> 타입은 <code>Foundation</code> 프레임워크의 <code>NSString</code> 클래스와 호환(bridged)된다. <code>Foundation</code> 프레임워크를 사용한다면 모든 <code>NSString</code> API를 <code>NSString</code>으로 타입 변환한 <code>String</code> 값에서 호출할 수 있다. 또한, 모든 <code>NSString</code> 인스턴스가 필요한 API에 <code>String</code> 값을 사용할 수 있다.</p><h3>문자열 리터럴</h3><ul><li>문자열 리터럴을 통해 <code>String</code> 값을 사용할 수 있다.</li><li>문자열 리터럴은 쌍따옴표로 둘러쌓인 연속된 문자이다.</li></ul><pre><code><span class="keyword">let</span> someString = <span class="string">"Some string literal value"</span>
+</code></pre><h3>빈 문자열 만들기</h3><ul><li>빈 문자열 리터럴 또는 <code>String</code> 이니셜라이저 문법을 통해 빈 문자열을 만들 수 있다.</li></ul><pre><code><span class="keyword">var</span> emptyString = <span class="string">""</span>
+<span class="keyword">var</span> anotherEmptyString = <span class="type">String</span>()
+</code></pre><ul><li>두 방법의 결과는 동일하다.</li><li><code>isEmpty</code> 속성을 통해 <code>String</code> 값이 빈 문자열인지 확인할 수 있다.</li></ul><pre><code><span class="keyword">if</span> emptyString.<span class="property">isEmpty</span> {
+    <span class="call">print</span>(<span class="string">"Nothing to see here"</span>)
+}
+</code></pre><h3>문자열 변수</h3><ul><li><code>String</code> 값을 변수 또는 상수로 할당할 수 있다.</li></ul><p>Objective-C를 쓰는 Cocoa와 다른 접근법이다.</p><h3>문자열은 값 타입이다</h3><ul><li>Swift의 <code>String</code> 타입은 값 타입이다.</li><li>새 <code>String</code> 값을 생성하면 함수 또는 메서드에 넘기거나 상수나 변수에 할당할 때 복사된 값을 넘긴다.</li></ul><p>Cocoa에서는 동일한 <code>NSString</code> 인스턴스를 참조한다.</p><ul><li>직접 변경하지 않은 이상 <code>String</code> 값이 변경되지 않았다고 확신할 수 있다.</li><li>Swift의 컴파일러는 반드시 복사가 필요할 때만 복사하도록 최적화한다. 이는 뛰어난 퍼포먼스를 의미한다.</li></ul><h3>문자 사용하기</h3><ul><li><code>for-in</code> 루프에 <code>String</code> 값의 <code>characters</code> 프로퍼티를 넣으면 각각의 <code>Character</code> 값에 접근할 수 있다.</li></ul><pre><code><span class="keyword">for</span> character <span class="keyword">in</span> <span class="string">"Dog!🐶"</span>.<span class="property">characters</span> {
+    <span class="call">print</span>(character)
+}
+</code></pre><ul><li>단일 문자 리터럴에 <code>Character</code> 타입 주석을 붙여서 독립적인 <code>Character</code> 상수나 변수를 만들 수 있다.</li><li><code>Character</code> 값의 배열을 <code>String</code> 값의 이니셜라이저 메서드에 넘겨서 <code>String</code> 값을 만들 수 있다.</li></ul><h3>문자열과 문자 결합하기</h3><ul><li><code>+</code> 연산자를 사용해서 문자열을 더한 새로운 <code>String</code> 값을 만들 수 있다.</li></ul><pre><code><span class="keyword">let</span> string1 = <span class="string">"hello"</span>
+<span class="keyword">let</span> string2 = <span class="string">" there"</span>
+<span class="keyword">var</span> welcome = string1 + string2
+</code></pre><ul><li><code>+=</code> 연산자도 사용할 수 있다.</li><li><code>String</code> 타입의 <code>append()</code> 메서드를 사용해서 <code>Character</code> 값을 덧붙일 수 있다.</li></ul><p><code>String</code> 또는 <code>Character</code> 값을 <code>Character</code> 값에 덧불일 수 없다. <code>Character</code> 값은 하나의 문자만을 포함해야 하기 때문이다.</p><h3>문자열 삽입(interpolation)</h3><ul><li>문자열 삽입은 상수, 변수, 리터럴, 표현식이 섞여있는 문자열 리터럴에서 새로운 <code>String</code> 값을 만들어내는 방법이다.</li><li>문자열 리터럴에 백슬래시가 앞에 붙은 괄호로 둘러쌓인 값을 삽입한다.</li></ul><pre><code><span class="keyword">let</span> multiplier = <span class="number">3</span>
+<span class="keyword">let</span> message = <span class="string">"</span>\(multiplier) <span class="string">times 2.5 is</span> \(<span class="type">Double</span>(multiplier) * <span class="number">2.5</span>)<span class="string">"</span>
+</code></pre><p>괄호 안에 이스케이프되지 않은 쌍따옴표 또는 백슬래시 그리고 캐리지 리턴과 라인 피드는 포함하지 못한다.</p><h3>유니코드</h3><ul><li>유니코드는 다양한 쓰기 시스템에서 인코딩, 표시하기, 텍스트 처리를 하기 위한 국제 표준이다.</li><li>Swift의 <code>String</code>과 <code>Character</code> 타입은 완전히 유니코드를 따른다.</li></ul><h4>유니코드 스칼라</h4><ul><li>Swift의 <code>String</code> 타입은 유니코드 스칼라 값으로 만들어졌다.</li><li>유니코드 스칼라는 문자 또는 변경자를 위한 21비트 숫자이다.</li></ul><ul><li>모든 21비트 유니코드 스칼라에 문자가 할당되어 있지 않다. 일부는 나중을 위해 예약되어 있다.</li><li>스칼라에는 문자가 할당되어 있고 보통 <em>LATIN SMALL LETTER A</em> 같은 이름도 가지고 있다.</li></ul><h4>스트링 리터럴에서의 특별한 문자</h4><ul><li>스트링 리터럴은 다음의 특별한 문자를 포함할 수 있다.</li><li><code>\0</code>(널 문자), <code>\\</code>(백슬래시), <code>\t</code>(가로 탭), <code>\n</code>(라인 피드), <code>\r</code>(캐리지 리턴), <code>\"</code>(쌍따옴표), <code>\’</code>(홑따옴표)</li><li><code>\u{n}</code>로 쓰인 임의의 유니코드 스칼라. <em>n</em>은 유효한 유니코드 포인트와 같은 1-8자의 16진수.</li></ul><pre><code><span class="keyword">let</span> wiseWords = <span class="string">"\"Imagination is more important than knowledge\" - Einstein"</span>
+<span class="comment">// "Imagination is more important than knowledge" - Einstein</span>
+<span class="keyword">let</span> dollarSign = <span class="string">"\u{24}"</span>        <span class="comment">// $,  Unicode scalar U+0024</span>
+<span class="keyword">let</span> blackHeart = <span class="string">"\u{2665}"</span>      <span class="comment">// ♥,  Unicode scalar U+2665</span>
+<span class="keyword">let</span> sparklingHeart = <span class="string">"\u{1F496}"</span> <span class="comment">// 💖, Unicode scalar U+1F496</span>
+</code></pre><h4>확장 자소 클러스터(Extended Grapheme Clusters)</h4><ul><li>모든 Swift의 <code>Character</code> 타입 인스턴스는 하나의 확장 자소 클러스터로 표현된다.</li><li>확장 자소 클러스터는 일련의 사람이 읽을 수 있는 문자(조합되었을 때)를 제공하는 하나 이상의 유니코드 스칼라이다.</li><li>예를 들어, <em>é</em>는 하나의 유니코드 스칼라로 표현된다(<em>LATIN SMALL LETTER E WITH ACUTE</em> 또는 <em>U+00E9</em>). 하지만 같은 문자를 <em>e</em>(<em>LATIN SMALL LETTER E</em> 또는 <em>U+0065</em>)와 뒤따르는 <em>COMBINING ACUTE ACCENT</em>(<em>U+0301</em>) 쌍으로 표현할 수 있다.</li><li>두 가지 경우 모두 하나의 <code>Character</code> 값으로 표현된다.</li></ul><pre><code><span class="keyword">let</span> eAcute: <span class="type">Character</span> = <span class="string">"\u{E9}"</span>                         <span class="comment">// é</span>
+<span class="keyword">let</span> combinedEAcute: <span class="type">Character</span> = <span class="string">"\u{65}\u{301}"</span>          <span class="comment">// e followed by ́
+// eAcute is é, combinedEAcute is é</span>
+</code></pre><ul><li>확장 자소 클러스터는 조합 문자를 하나의 <code>Character</code> 값으로 표현한다. 예를 들어, 미리 조합된 문자와 분해된 문자 모두 하나의 <code>Character</code> 값으로 표현된다.</li></ul><pre><code><span class="keyword">let</span> precomposed: <span class="type">Character</span> = <span class="string">"\u{D55C}"</span>                  <span class="comment">// 한</span>
+<span class="keyword">let</span> decomposed: <span class="type">Character</span> = <span class="string">"\u{1112}\u{1161}\u{11AB}"</span>   <span class="comment">// ᄒ, ᅡ, ᆫ
+// precomposed is 한, decomposed is 한</span>
+</code></pre><ul><li>확장 자소 클러스터는 스칼라를 감쌀 수도 있다.</li></ul><pre><code><span class="keyword">let</span> enclosedEAcute: <span class="type">Character</span> = <span class="string">"\u{E9}\u{20DD}"</span>
+<span class="comment">// enclosedEAcute is é⃝</span>
+</code></pre><ul><li>지역 표시 문자(regional indicator symbols)를 위한 유니코드 스칼라 한 쌍은 조합되어 하나의 <code>Character</code> 값을 만든다. <em>REGIONAL INDICATOR SYMBOL LETTER U</em>(<em>U+1F1FA</em>)와 <em>REGIONAL INDICATOR SYMBOL LETTER S</em>(<em>U+1F1F8</em>)</li></ul><pre><code><span class="keyword">let</span> regionalIndicatorForUS: <span class="type">Character</span> = <span class="string">"\u{1F1FA}\u{1F1F8}"</span>
+<span class="comment">// regionalIndicatorForUS is 🇺🇸</span>
+</code></pre><h3>문자 세기</h3><ul><li>문자열의 <code>Character</code> 값의 수를 얻기 위해 문자열의 <code>characters</code> 프로퍼티의 <code>count</code> 프로퍼티를 사용한다.</li></ul><pre><code><span class="keyword">let</span> unusualMenagerie = <span class="string">"Koala 🐨, Snail 🐌, Penguin 🐧, Dromedary 🐪"</span>
+<span class="call">println</span>(<span class="string">"unusualMenagerie has</span> \(unusualMenagerie.<span class="property">characters</span>.<span class="property">count</span>) <span class="string">characters"</span>)
+<span class="comment">// prints "unusualMenagerie has 40 characters"</span>
+</code></pre><ul><li>Swift의 확장 자소 클러스터를 사용한 <code>Character</code> 값은 문자열 덧붙이기나 변경이 항상 문자열의 길이에 영향을 주지는 않는다는 것을 의미한다.</li><li>예를 들어, 4문자 단어 <em>cafe</em>에 <em>COMBINING ACUTE ACCECT</em>(<em>U+0301</em>)을 끝에 덧붙이면 문자 길이는 여전히 4이다.</li></ul><pre><code><span class="keyword">var</span> word = <span class="string">"cafe"</span>
+<span class="call">println</span>(<span class="string">"the number of characters in</span> \(word) <span class="string">is</span> \(word.<span class="property">characters</span>.<span class="property">count</span>)<span class="string">"</span>)
+<span class="comment">// prints "the number of characters in cafe is 4"</span>
+
+word += <span class="string">"\u{301}"</span>    <span class="comment">// COMBINING ACUTE ACCENT, U+0301</span>
+
+<span class="call">println</span>(<span class="string">"the number of characters in</span> \(word) <span class="string">is</span> \(word.<span class="property">characters</span>.<span class="property">count</span>)<span class="string">"</span>)
+<span class="comment">// prints "the number of characters in café is 4"</span>
+</code></pre><p>확장 자소 클러스터는 하나 이상의 유니코드 스칼라로 조합된다. 이는 같은 문자에 대한 다른 표현을 저장하기 위한 메모리 양이 다르다는 것을 의미한다.</p><p><code>characters</code> 프로퍼티와 <code>NSString</code>의 <code>length</code>와 항상 같지 않다.</p><h3>문자열 접근과 수정</h3><ul><li>문자열의 메서드와 프로퍼티 또는 서브스크립트 문법을 통해 문자열에 접근하고 수정한다.</li></ul><h4>문자열 인덱스</h4><ul><li>각각의 <code>String</code> 값은 포함하고 있는 각 <code>Character</code>의 위치를 가리키는 <code>String.Index</code> 타입을 가지고 있다.</li><li>앞서 언급한 것처럼 각 문자는 서로 다른 양의 메모리가 필요하다. 그래서 <code>Character</code>는 각자의 위치를 결정하기 위해 <code>String</code>의 처음부터 끝까지 반복해야 한다. 이런 이유로 Swift의 문자열은 정수로 색인되지 않는다.</li><li><code>startIndex</code> 프로퍼티는 <code>String</code>의 첫 번째 <code>Character</code>에 접근한다.</li><li><code>endIndex</code> 프로퍼티는 마지막 문자 다음을 반환한다.</li><li><code>String.Index</code> 값은 <code>predecessor()</code> 메서드를 호출해 직전 인덱스에 접근할 수 있고, <code>successor()</code> 메서드를 호출해 직후 인덱스에 접근할 수 있다.</li><li><code>String</code>의 모든 인덱스는 이들 메서드를 연결하거나 전역 함수 <code>advance(start:n:)</code>를 사용해서 접근할 수 있다.</li><li>문자열의 범위를 벗어난 인덱스에 접근하려고 시도하면 런타임 에러가 발생한다.</li><li><code>String</code>의 각 인덱스에 위치한 <code>Character</code>에 접근하기 위해 서브스크립트 문법을 사용할 수 있다.</li></ul><pre><code><span class="keyword">let</span> greeting = <span class="string">"Guten Tag"</span>
+greeting[greeting.<span class="property">startIndex</span>]
+<span class="comment">// G</span>
+greeting[greeting.<span class="property">endIndex</span>.<span class="call">predecessor</span>()]
+<span class="comment">// g</span>
+greeting[greeting.<span class="property">startIndex</span>.<span class="call">successor</span>()]
+<span class="comment">// u</span>
+<span class="keyword">let</span> index = <span class="call">advance</span>(greeting.<span class="property">startIndex</span>, <span class="number">7</span>)
+greeting[index]
+<span class="comment">// a</span>
+greeting[greeting.<span class="property">endIndex</span>] <span class="comment">// error</span>
+greeting.<span class="property">endIndex</span>.<span class="call">successor</span>() <span class="comment">// error</span>
+</code></pre><ul><li>문자열의 각각의 문자에 접근하기 위한 모든 인덱스의 <code>Range</code>를 만들기 위해 전역 함수 <code>indices(_:)</code>를 사용한다.</li></ul><pre><code><span class="keyword">for</span> index <span class="keyword">in</span> <span class="call">indices</span>(greeting) {
+    <span class="call">print</span>(<span class="string">"</span>\(greeting[index])<span class="string">"</span>)
+}
+<span class="call">print</span>(<span class="string">"\n"</span>)
+<span class="comment">// prints "Guten Tag"</span>
+</code></pre><h4>삽입과 제거</h4><ul><li>문자열의 특정 인덱스에 문자를 삽입하기 위해, <code>insert(_:atIndex:)</code> 메서드를 사용한다.</li></ul><pre><code><span class="keyword">var</span> welcome = <span class="string">"hello"</span>
+welcome.<span class="call">insert</span>(<span class="string">"!"</span>, atIndex: welcome.<span class="property">endIndex</span>)
+<span class="comment">// welcome now equals "hello!"</span>
+</code></pre><ul><li>다른 문자열을 특정 인덱스에 삽입하기 위해, <code>splice(_:atIndex:)</code> 메서드를 사용한다.</li></ul><pre><code>welcome.<span class="call">splice</span>(<span class="string">" there"</span>.<span class="property">characters</span>, atIndex: welcome.<span class="property">endIndex</span>.<span class="call">predecessor</span>())
+<span class="comment">// welcome now equals "hello there!"</span>
+</code></pre><ul><li>문자열에서 특정 인덱스의 문자를 제거하기 위해, <code>removeAtIndex(_:)</code> 메서드를 사용한다.</li></ul><pre><code>welcome.<span class="call">removeAtIndex</span>(welcome.<span class="property">endIndex</span>.<span class="call">predecessor</span>())
+<span class="comment">// welcome now equals "hello there"</span>
+</code></pre><ul><li>특정 범위의 문자열을 제거하기 위해, <code>removeRange(_:)</code> 메서드를 사용한다.</li></ul><pre><code><span class="keyword">let</span> range = <span class="call">advance</span>(welcome.<span class="property">endIndex</span>, -<span class="number">6</span>)..&lt;welcome.<span class="property">endIndex</span>
+welcome.<span class="call">removeRange</span>(range)
+<span class="comment">// welcome now equals "hello"</span>
+</code></pre><h3>문자열 비교</h3><ul><li>Swift는 문자열과 문자 비교, 전위 비교, 후위 비교를 제공한다.</li></ul><h4>문자와 문자 동일성</h4><ul><li><code>==</code> 연산자와 <code>!=</code> 연산자로 동일성을 확인한다.</li></ul><ul><li>만약 두 <code>String</code> 값의 확장 문자 클러스터가 언어학적으로 같은 의미와 형태라면 같다고 간주한다.</li><li>반대로 영어에서 사용하는 <em>LATIN CAPITAL LETTER A</em>(<em>U+0041</em> 또는 <em>"A"</em>)와 러시아어에서 사용하는 <em>CYRILLIC CAPITAL LETTER A</em>(<em>U+0410</em> 또는 <em>"A"</em>)는 같지 않다.</li></ul><p>Swift의 문자열과 문자 비교는 로케일 무관하다.</p><h4>전위 후위 동일성</h4><ul><li>문자열의 <code>hasPrefix(_:)</code>와 <code>hasSuffix(_:)</code> 메서드를 호출해서 비교한다.</li></ul><h3>문자열의 유니코드 표현</h3><ul><li>유니코드 문자열이 텍스트 파일이나 다른 저장소에 쓰여질 때, 문자열의 유니코드 스칼라는 유니코드 정의 인코딩 양식 중 하나로 부호화된다.</li><li>각 양식은 <em>코드 유닛</em>으로 알려진 작은 단위로 문자열을 부호화한다.</li><li>이 양식은 UTF-8, UTF-16, UTF-32를 포함한다.</li></ul><ul><li>Swift는 문자열의 유니코드 표현에 접근하는 몇 가지 방법을 제공한다.</li><li><code>for-in</code> 문에서 반복을 통해 각 확장 자소 클러스터 <code>Character</code> 값에 접근할 수 있다.</li><li>다른 방법으로는 <code>String</code> 값의 세 프로퍼티 - <code>utf8</code>, <code>utf16</code>, <code>utf32</code>를 사용한다.</li></ul><h4>유니코드 스칼라 표현</h4><ul><li><code>String</code> 값의 <code>unicodeScalars</code> 프로퍼티를 반복해서, 유니코드 스칼라 표현에 접근할 수 있다.</li><li>이 프로퍼티의 타입인 <code>UnicodeScalarView</code>는 <code>UnicodeScalar</code>의 값의 묶음이다.</li><li>각 <code>UnicodeScalar</code>는 <code>UInt32</code> 값으로 표현되는 스칼라의 21비트 값을 반환하는 <code>value</code> 프로퍼티를 가지고 있다.</li></ul>]]></content:encoded></item></channel></rss>

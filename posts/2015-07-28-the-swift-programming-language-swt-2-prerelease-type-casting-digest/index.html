@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta property="og:site_name" content="Optional Unwrapping"/><link rel="canonical" href="https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-type-casting-digest"/><meta name="twitter:url" content="https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-type-casting-digest"/><meta property="og:url" content="https://ririsid.github.io/posts/2015-07-28-the-swift-programming-language-swt-2-prerelease-type-casting-digest"/><title>Swift 프로그래밍 언어 - 타입 변환 | Optional Unwrapping</title><meta name="twitter:title" content="Swift 프로그래밍 언어 - 타입 변환 | Optional Unwrapping"/><meta property="og:title" content="Swift 프로그래밍 언어 - 타입 변환 | Optional Unwrapping"/><meta name="description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:description" content="암묵지 꺼내기 #Swift #iOS"/><meta property="og:description" content="암묵지 꺼내기 #Swift #iOS"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Optional Unwrapping"/></head><body class="item-page"><header><div class="wrapper"><a href="/" class="site-name">Optional Unwrapping</a></div></header><div class="wrapper"><article><p>2015년 7월 28일</p><div class="content"><h1>Swift 스터디 5주차 (2015-08-01)</h1><p><strong>이 문서는 Apple의 <em>The Swift Programming Language (Swift 2 Prerelease)</em>의 요약입니다.</strong></p><h2>타입 변환(Type Casting)</h2><ul><li><em>타입 변환(Type Casting)</em>은 인스턴스의 타입을 확인하는 방법이다. 또는 그 인스턴스를 자신의 클래스 계층에 속한 슈퍼클래스 또는 서브클래스인 것처럼 속이는 것이다.</li><li>Swift에서 타입 변환은 <code>is</code> 또는 <code>as</code> 연산자를 써서 구현된다.</li><li>타입이 프로토콜을 따르는 지 확인할 때도 타입 변환을 쓸 수 있다.</li></ul><h3>타입 변환을 위한 클래스 계층 선언</h3><pre><code><span class="keyword">class</span> MediaItem {
+    <span class="keyword">var</span> name: <span class="type">String</span>
+    <span class="keyword">init</span>(name: <span class="type">String</span>) {
+        <span class="keyword">self</span>.<span class="property">name</span> = name
+    }
+}
+</code></pre><pre><code><span class="keyword">class</span> Movie: <span class="type">MediaItem</span> {
+    <span class="keyword">var</span> director: <span class="type">String</span>
+    <span class="keyword">init</span>(name: <span class="type">String</span>, director: <span class="type">String</span>) {
+        <span class="keyword">self</span>.<span class="property">director</span> = director
+        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name)
+    }
+}
+
+<span class="keyword">class</span> Song: <span class="type">MediaItem</span> {
+    <span class="keyword">var</span> artist: <span class="type">String</span>
+    <span class="keyword">init</span>(name: <span class="type">String</span>, artist: <span class="type">String</span>) {
+        <span class="keyword">self</span>.<span class="property">artist</span> = artist
+        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name)
+    }
+}
+</code></pre><pre><code><span class="keyword">let</span> library = [
+    <span class="type">Movie</span>(name: <span class="string">"Casablanca"</span>, director: <span class="string">"Michael Curtiz"</span>),
+    <span class="type">Song</span>(name: <span class="string">"Blue Suede Shoes"</span>, artist: <span class="string">"Elvis Presley"</span>),
+    <span class="type">Movie</span>(name: <span class="string">"Citizen Kane"</span>, director: <span class="string">"Orson Welles"</span>),
+    <span class="type">Song</span>(name: <span class="string">"The One And Only"</span>, artist: <span class="string">"Chesney Hawkes"</span>),
+    <span class="type">Song</span>(name: <span class="string">"Never Gonna Give You Up"</span>, artist: <span class="string">"Rick Astley"</span>)
+]
+<span class="comment">// the type of "library" is inferred to be [MediaItem]</span>
+</code></pre><ul><li>Swift의 타입 체커(type checker)는 <code>Movie</code>와 <code>Song</code>가 공통 슈퍼클래스인 <code>MediaItem</code>을 가지고 있다고 추정할 수 있고, <code>library</code>를 <code>[MediaItem]</code>로 추론한다.</li><li><code>library</code>에 있는 아이템들은 여전히 <code>Movie</code>와 <code>Song</code> 인스턴스다.</li><li>하지만 이 배열의 내용을 순회한다면 아이템들은 <code>Movie</code>나 <code>Song</code>이 아닌 <code>MediaItem</code>으로 반환 받는다.</li><li>그것들을 자신의 타입으로 사용하기 위해 타입을 <em>확인(check)</em>하거나 다른 타입으로 <em>다운캐스트(downcast)</em>해야 한다.</li></ul><h3>타입 확인</h3><ul><li>타입 확인 연산자(<code>is</code>)를 사용해 인스턴스가 특정 서브클래스인지 확인한다.</li><li>타입 확인 연산자는 인스턴스가 특정 서브클래스면 <code>true</code>를 반환하고, 아니면 <code>false</code>를 반환한다.</li></ul><pre><code><span class="keyword">var</span> movieCount = <span class="number">0</span>
+<span class="keyword">var</span> songCount = <span class="number">0</span>
+
+<span class="keyword">for</span> item <span class="keyword">in</span> library {
+    <span class="keyword">if</span> item <span class="keyword">is</span> <span class="type">Movie</span> {
+        ++movieCount
+    } <span class="keyword">else if</span> item <span class="keyword">is</span> <span class="type">Song</span> {
+        ++songCount
+    }
+}
+
+<span class="call">print</span>(<span class="string">"Media library contains</span> \(movieCount) <span class="string">movies and</span> \(songCount) <span class="string">songs"</span>)
+<span class="comment">// prints "Media library contains 2 movies and 3 songs"</span>
+</code></pre><h3>다운캐스팅(Downcasting)</h3><ul><li>특정 클래스 타입의 상수나 변수는 실제로 서브클래스의 인스턴스를 가리키고 있을 수 있다.</li><li>이런 경우 <em>타입 변환 연산자(type cast operator)</em>(<code>as?</code> 또는 <code>as!</code>)를 사용해 서브클래스 타입으로 다운캐스트(<em>downcast</em>)를 시도할 수 있다.</li><li>다운캐스트는 실패할 수 있기 때문에 두 가지 형식이다.</li><li>조건 형식(conditional form), <code>as?</code>는 다운캐스트 하려는 타입의 옵셔널 값을 반환한다.</li><li>강제 형식(forced form), <code>as!</code>는 다운캐스트를 시도하고 결과를 강제추출(force-unwraps)한다.</li><li>다운캐스트가 성공할 지 확실하지 않을 때는 조건 형식 <code>as?</code>를 사용하라. 다운캐스트가 불가능할 때 그 값은 <code>nil</code>이 될 것이다.</li><li>다운캐스트가 항상 성공할 때만 강제 형식 <code>as!</code>를 사용하라. 잘못된 타입으로 다운캐스트를 시도하면 런타임 에러가 발생한다.</li></ul><pre><code><span class="keyword">for</span> item <span class="keyword">in</span> library {
+    <span class="keyword">if let</span> movie = item <span class="keyword">as</span>? <span class="type">Movie</span> {
+        <span class="call">print</span>(<span class="string">"Movie: '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+    } <span class="keyword">else if let</span> song = item <span class="keyword">as</span>? <span class="type">Song</span> {
+        <span class="call">print</span>(<span class="string">"Song: '</span>\(song.<span class="property">name</span>)<span class="string">', by</span> \(song.<span class="property">artist</span>)<span class="string">"</span>)
+    }
+}
+
+<span class="comment">// Movie: 'Casablanca', dir. Michael Curtiz
+// Song: 'Blue Suede Shoes', by Elvis Presley
+// Movie: 'Citizen Kane', dir. Orson Welles
+// Song: 'The One And Only', by Chesney Hawkes
+// Song: 'Never Gonna Give You Up', by Rick Astley</span>
+</code></pre><blockquote><p>변환(casting)은 인스턴스나 그 값을 실제로 변경하지 않는다. 기저의 인스턴스는 그대로 있고, 단순히 타입의 인스턴스로 속이고 접근한다.</p></blockquote><h3><code>Any</code>와 <code>AnyObject</code>로 타입 변환</h3><ul><li>Swift는 불특정 타입으로 작업하기 위한 두 가지 특별한 타입 별칭(alias)을 제공한다.<ul><li><code>AnyObject</code>는 어떤 <code>class</code> 타입의 인스턴스도 표현할 수 있다.</li><li><code>Any</code>는 함수 타입을 포함한 모든 타입의 인스턴스를 표현할 수 있다.</li></ul></li></ul><blockquote><p><code>AnyObject</code>와 <code>Any</code>는 그것이 제공하는 행동이나 능력이 꼭 필요할 때만 사용하라. 코드에서 기대하는 타입에 대해 명확히 하는 것은 항상 좋다.</p></blockquote><h4><code>AnyObject</code></h4><ul><li>Cocoa API로 작업을 할 때 <code>[AnyObject]</code> 타입의 배열을 받는 일은 흔하다. 이는 Objective-C가 명시 타입 배열을 가지고 있지 않기 때문이다.</li><li>하지만 때로는 제공된 API에 관한 정보를 통해 각 배열에 포함된 객체의 타입을 확신할 수 있다.</li><li>이런 경우, 강제 타입 변환 연산자(<code>as</code>)를 사용해서 옵셔널 언래핑(optional unwrapping)을 사용하지 않고, 배열 안의 각 아이템을 <code>AnyObject</code>보다 더 정확한 클래스 타입으로 다운캐스트 할 수 있다.</li></ul><pre><code><span class="keyword">let</span> someObjects: [<span class="type">AnyObject</span>] = [
+    <span class="type">Movie</span>(name: <span class="string">"2001: A Space Odyssey"</span>, director: <span class="string">"Stanley Kubrick"</span>),
+    <span class="type">Movie</span>(name: <span class="string">"Moon"</span>, director: <span class="string">"Duncan Jones"</span>),
+    <span class="type">Movie</span>(name: <span class="string">"Alien"</span>, director: <span class="string">"Ridley Scott"</span>)
+]
+</code></pre><pre><code><span class="keyword">for</span> object <span class="keyword">in</span> someObjects {
+    <span class="keyword">let</span> movie = object <span class="keyword">as</span>! <span class="type">Movie</span>
+    <span class="call">print</span>(<span class="string">"Movie: '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+}
+<span class="comment">// Movie: '2001: A Space Odyssey', dir. Stanley Kubrick
+// Movie: 'Moon', dir. Duncan Jones
+// Movie: 'Alien', dir. Ridley Scott</span>
+</code></pre><pre><code><span class="keyword">for</span> movie <span class="keyword">in</span> someObjects <span class="keyword">as</span>! [<span class="type">Movie</span>] {
+    <span class="call">print</span>(<span class="string">"Movie: '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+}
+<span class="comment">// Movie: '2001: A Space Odyssey', dir. Stanley Kubrick
+// Movie: 'Moon', dir. Duncan Jones
+// Movie: 'Alien', dir. Ridley Scott</span>
+</code></pre><h4><code>Any</code></h4><ul><li><code>Any</code>를 사용해서 함수 타입과 클래스가 아닌 타입을 포함한 복합 타입으로 작업할 수 있다.</li></ul><pre><code><span class="keyword">var</span> things = [<span class="type">Any</span>]()
+
+things.<span class="call">append</span>(<span class="number">0</span>)
+things.<span class="call">append</span>(<span class="number">0.0</span>)
+things.<span class="call">append</span>(<span class="number">42</span>)
+things.<span class="call">append</span>(<span class="number">3.14159</span>)
+things.<span class="call">append</span>(<span class="string">"hello"</span>)
+things.<span class="call">append</span>((<span class="number">3.0</span>, <span class="number">5.0</span>))
+things.<span class="call">append</span>(<span class="type">Movie</span>(name: <span class="string">"Ghostbusters"</span>, director: <span class="string">"Ivan Reitman"</span>))
+things.<span class="call">append</span>({ (name: <span class="type">String</span>) -&gt; <span class="type">String</span> <span class="keyword">in</span> <span class="string">"Hello,</span> \(name)<span class="string">"</span> })
+</code></pre><ul><li><code>switch</code> 문의 케이스(case)에서 <code>is</code>와 <code>as</code> 연산자를 사용해서 <code>Any</code> 혹은 <code>AnyObject</code> 타입으로만 알고 있는 상수나 변수의 지정 타입을 알 수 있다.</li></ul><pre><code><span class="keyword">for</span> thing <span class="keyword">in</span> things {
+    <span class="keyword">switch</span> thing {
+    <span class="keyword">case</span> <span class="number">0</span> <span class="keyword">as</span> <span class="type">Int</span>:
+        <span class="call">print</span>(<span class="string">"zero as an Int"</span>)
+    <span class="keyword">case</span> <span class="number">0</span> <span class="keyword">as</span> <span class="type">Double</span>:
+        <span class="call">print</span>(<span class="string">"zero as a Double"</span>)
+    <span class="keyword">case let</span> someInt <span class="keyword">as</span> <span class="type">Int</span>:
+        <span class="call">print</span>(<span class="string">"an integer value of</span> \(someInt)<span class="string">"</span>)
+    <span class="keyword">case let</span> someDouble <span class="keyword">as</span> <span class="type">Double</span> <span class="keyword">where</span> someDouble &gt; <span class="number">0</span>:
+        <span class="call">print</span>(<span class="string">"a positive double value of</span> \(someDouble)<span class="string">"</span>)
+    <span class="keyword">case is</span> <span class="type">Double</span>:
+        <span class="call">print</span>(<span class="string">"some other double value that I don't want to print"</span>)
+    <span class="keyword">case let</span> someString <span class="keyword">as</span> <span class="type">String</span>:
+        <span class="call">print</span>(<span class="string">"a string value of \"</span>\(someString)<span class="string">\"")</span>
+    <span class="keyword">case let</span> (x, y) <span class="keyword">as</span> (<span class="type">Double</span>, <span class="type">Double</span>):
+        <span class="call">print</span>(<span class="string">"an (x, y) point at</span> \(x)<span class="string">,</span> \(y)<span class="string">"</span>)
+    <span class="keyword">case let</span> movie <span class="keyword">as</span> <span class="type">Movie</span>:
+        <span class="call">print</span>(<span class="string">"a movie called '</span>\(movie.<span class="property">name</span>)<span class="string">', dir.</span> \(movie.<span class="property">director</span>)<span class="string">"</span>)
+    <span class="keyword">case let</span> stringConverter <span class="keyword">as</span> <span class="type">String</span> -&gt; <span class="type">String</span>:
+        <span class="call">print</span>(<span class="call">stringConverter</span>(<span class="string">"Michael"</span>))
+    <span class="keyword">default</span>:
+        <span class="call">print</span>(<span class="string">"something else"</span>)
+    }
+}
+
+<span class="comment">// zero as an Int
+// zero as a Double
+// an integer value of 42
+// a positive double value of 3.14159
+// a string value of "hello"
+// an (x, y) point at 3.0, 5.0
+// a movie called 'Ghostbusters', dir. Ivan Reitman
+// Hello, Michael</span>
+</code></pre><blockquote><p><code>switch</code> 문의 케이스는 타입을 확인하고 변환하기 위해 강제 타입 변환 연산자(<code>as</code>, <code>as?</code> 아님)를 사용한다. 이 방법은 <code>switch</code> 케이스 문의 문맥 안에서 항상 안전하다.</p></blockquote></div><ul class="tag-list"><li><a href="/tags/swift">Swift</a></li></ul></article></div><footer><p>Generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
