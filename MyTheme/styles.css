@@ -166,7 +166,7 @@ ul + blockquote {
 blockquote {
     background-color: #eee;
     border: 1px solid #eee;
-    border-left: 2px solid #ccc;
+    border-left: 2px solid #1d1d1f;
     margin: 10px 20px;
     padding: 10px;
 }
@@ -187,7 +187,7 @@ hr + * {
     margin-bottom: 40px;
 }
 
-.item-list > li {
+.item-list>li {
     align-items: center;
     border-radius: 15px;
     border: 1px solid #d2d2d7;
@@ -199,15 +199,15 @@ hr + * {
     position: relative;
 }
 
-.item-list > li:first-child {
+.item-list>li:first-child {
     margin-top: 0;
 }
 
-.item-list > li a {
+.item-list>li a {
     text-decoration: none;
 }
 
-.item-list > li .title {
+.item-list>li .title {
     color: #1d1d1f;
     display: inline;
     font-size: 1.23529rem;
@@ -217,7 +217,7 @@ hr + * {
     vertical-align: middle;
 }
 
-.item-list > li .title + * {
+.item-list>li .title + * {
     margin-top: 0.8em;
 }
 
@@ -283,26 +283,7 @@ hr + * {
 }
 
 footer {
-    color: #8a8a8a;
-}
-
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #222;
-    }
-
-    body,
-    header .site-name {
-        color: #ddd;
-    }
-
-    .item-list > li {
-        background-color: #333;
-    }
-
-    header {
-        background-color: #000;
-    }
+    color: #f5f5f7;
 }
 
 @media(max-width: 600px) {
@@ -314,7 +295,6 @@ footer {
 /* 코드 하이라이트 */
 
 code {
-    color: #6e6e73;
     font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, monospace;
     font-size: 1em;
     font-style: normal;
@@ -347,6 +327,7 @@ pre {
 }
 
 pre code {
+    color: #000;
     display: block;
     font-size: .88235rem;
     font-style: normal;
@@ -364,11 +345,11 @@ pre code .type {
 }
 
 pre code .call {
-    color: #6c36a9;
+    color: #000;
 }
 
 pre code .property {
-    color: #6c36a9;
+    color: #000;
 }
 
 pre code .number {
@@ -384,7 +365,7 @@ pre code .comment {
 }
 
 pre code .dotAccess {
-    color: #6c36a9;
+    color: #000;
 }
 
 pre code .preprocessing {
@@ -393,4 +374,87 @@ pre code .preprocessing {
 
 pre + * {
     margin-top: 1.6em;
+}
+
+/* 다크 모드 */
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #000;
+        color: #f5f5f7;
+    }
+
+    header {
+        background-color: #000;
+    }
+
+    header .site-name {
+        color: #f5f5f7;
+    }
+
+    blockquote {
+        background-color: #323232;
+        border-color: #9a9a9e;
+        border-left-color: #f5f5f7;
+    }
+
+    .item-list>li {
+        border-color: #424245;
+    }
+
+    .item-list>li .title {
+        color: #f5f5f7;
+    }
+
+    .tag-list li,
+    .tag {
+        background-color: #1d1d1f;
+        color: #f5f5f7;
+    }
+
+    pre {
+        background: #333336;
+        border-color: #424245;
+        color: #fff;
+    }
+
+    pre code {
+        color: #fff;
+    }
+
+    pre code .keyword {
+        color: #ff7ab2;
+    }
+
+    pre code .type {
+        color: #dabaff;
+    }
+
+    pre code .call {
+        color: #fff;
+    }
+
+    pre code .property {
+        color: #fff;
+    }
+
+    pre code .number {
+        color: #d9c97c;
+    }
+
+    pre code .string {
+        color: #ff8170;
+    }
+
+    pre code .comment {
+        color: #7f8c98;
+    }
+
+    pre code .dotAccess {
+        color: #fff;
+    }
+
+    pre code .preprocessing {
+        color: #ffa14f;
+    }
 }
