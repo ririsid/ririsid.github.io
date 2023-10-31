@@ -164,9 +164,7 @@ ul + blockquote {
 }
 
 blockquote {
-    background-color: #eee;
-    border: 1px solid #eee;
-    border-left: 2px solid #1d1d1f;
+    border-left: 5px solid #d2d2d7;
     margin: 10px 20px;
     padding: 10px;
 }
@@ -393,8 +391,6 @@ pre + * {
     }
 
     blockquote {
-        background-color: #323232;
-        border-color: #9a9a9e;
         border-left-color: #f5f5f7;
     }
 
